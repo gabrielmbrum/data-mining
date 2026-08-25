@@ -1,7 +1,8 @@
 # 18/08 - dados
 
+## types of data
 
-## attributes and object
+### attributes and object
 
 é uma coleção de objetos de dados e seus atributos. um **atributo** é a propriedade ou características de um objeto. uma coleção de atributos descreve um **objeto**.
 
@@ -31,7 +32,7 @@ o tipo de operação permitida é baseado no tipo de atributo.
 - simétrico: ambos os valores importam (ex.: gênero)
 - assimétrico: os valores não são igualmente importantes (ex.: um booleano que define se um estudante fez ou não uma materia na faculdade, a maioria é 0, o que mais importa é as que ele fez e tem 1)
 
-## tipos de *data sets*
+### types of *data sets*
 
 **características chaves**
 - dimensionalidade: nuimero de atributos do objeto
