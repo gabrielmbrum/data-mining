@@ -273,3 +273,6 @@ transformação aplicada a todos os valores de uma variável (atributo).
 ***simple functions*** é quando aplica-se uma simples função matemática (ex.: $x$ vira $x^k$, $log x$, $e^x$, $\sqrt{x}$, $\dots$). na estatística utilizam para transformar sem características guassianas, aplicando raiz quadrada, log ou 1/x, para então os dados ficarem em uma distribuição guassiana. é essencial utilizar com cuidado, passando pelas seguintes perguntas antes: o que é desejado com a transformação? a ordem precisa ser mantida? a transformação é aplicável em todos os valores, mesmo 0 e negativos? qual é o efeito em valores entre 0 e 1?
 
 ***normalization or standardization*** utilizada para um conjunto de valores ter a mesma propriedade. por exemplo, comparar pessoas por meio de idade e renda, as idades tem um range muito menor que a rendam então precisa-se levar em conta isso. comumente utiliza-se a transformação de $x' = (x - \overline{x})/s_x$, onde $\overline{x}$ é a média do atributo e $s_x$ o desvio padrão. então se normaliza usando mediana e o desvio padrão absoluto (sendo $x$ uma variável, o *absolute standard deviation* é $\sigma_A = \sum_{i=1}^{m} |x_i - \mu|$, onde $x_i$ é o i-ésimo valor da variável, $m$ é o total de objetos, e $\mu$ é a média/mediana).
+
+### measures of similarity and dissimilarity
+
