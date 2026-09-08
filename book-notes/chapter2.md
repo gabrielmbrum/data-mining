@@ -262,7 +262,7 @@ a trnasformação de contínuo em categórico involve duas partes: (i) decidir q
 
 >*entropy*: sendo $k$ o n° de classes, $m_i$ a quantidade de valores no $i^{ésimo}$ intervalo de um partição, e $m_{ij}$ o n° de valores da classe $j$ no intervalo $i$. então a entropia $e_i$ do $i^{ésimo}$ intervalo é igual a  $$e_i = - \sum_{j=1}^k p_{ij} log_2 p_{ij}$$ onde $p_{ij} = m_{ij}/m_i$ é a probabilidade da classe $j$ no $i^{ésimo}$ intervalo. então a entropia total $e$ é a média ponderada dos valores de entropia de cada intervalo $$e =  \sum^n_{i=1} w_i e_i$$ onde $m$ é o número de valores, $w_i = m_i/m$ é a fração  de valores no $i^{ésimo}$ intervalo, e $n$ é o n° de intervalos. 
 
-#### *atributos categóricos com muitos  valores*  
+#### *atributos categóricos com muitos valores*  
 
 utiliza-se de conhecimento do domínio (ex.: temos um atributo de disciplinas em uma grande universidade, então agrupa-se por cursos, ou ainda mais, por departamentos). caso não seja possível,  ou produza resultados ruins, então usa-se  de  abbordagens empiricas, como  agrupar apenas as classes que ao serem unidas melhoram os resultados do algoritmo. 
 
@@ -276,3 +276,36 @@ transformação aplicada a todos os valores de uma variável (atributo).
 
 ### measures of similarity and dissimilarity
 
+são importantes pois são utilizadas em diversas técnicas de mineração, como *clustering*, classificação por vizinhos próximos e detecção de anomalias. 
+
+#### *basics*
+
+##### *definitions*
+
+a **similaridade** é a medida numérica do grau em que dois objetos são parecidos. geralmente são valores não negativos, entre 0 e 1 (quanto mais próximo de 1, mais parecidos são os objetos).
+
+a **dissimilaridade** é a medida numérica do grau em que dois objetos são diferentes. frequentemente, o termo distância é dado como sinônimo dessa medida, porém este termo é apenas uma classe de dissimilaridade. algumas vezes estão na mesma escala de [0, 1], porém é comum que está entre 0 e +inf.
+
+##### *transformations*
+
+frequentemente utilizadas para converter similaridade em dissimilaridade, ou vice versa, ou para transformar uma medida para um intervalo específico, ex.: [0, 1].
+
+a transformação linear é a mais comum, e segue a seguinte fórmula $$s' = (s - min_s)/(max_s - min_s)$$. a transformação linear presservar as distâncias relativass entre pontos, ex.: ao transformar um *range* [1, 10] para [0, 1], usamos $s' = (s - 1)/9$, a distância relativa entre dois pontos é mantida, onde se dois pontos $x_1$ e $x_2$ são duas vezes mais distantes que $x_3$ e $x_4$ na escala original, isso é mantido na escala resultante. 
+
+para intervalos infinitos, como de [0, +inf], pode-se considerar uma transformação como $$d' = d/(1 + d)$$, em que as dissimilaridades 0, 0,5, 2, 10, 100 e 1000 viram 0, 0,33, 0,67, 0,90, 0,99 e 0,999. 
+
+mapear medidas de proximidade para o intervalo [0, 1] pode mudar o significado da medida, podendo, por exemplo, perder informação do sinal ao mapear de [-1, 1] para [0, 1], o que pode ser importante em determinado contexto.
+
+transformar similaridade em dissimilaridade pode ser feito por $d = 1 - s$, e existem várias outras fórmulas, onde o que deve ser mantido é que quanto maior o valor original, menor deve ser o valor resultante. 
+
+#### *similarity and dissimilarity between simple attributes*
+
+atributos nominais tem sua similaridade booleana, com 1 sendo *match* e 0 caso contrário, já para a dissimilaridade é o contrário, mas seguem booleanos. 
+
+objetos com um único atributo ordinal, a ordem deve ser levada em conta, como classes qualidade de um doce, ex.: {ruim, aceitável, ok, boa, maravilhosa}. então coloca-se inteiros mantendo a ordem de qualidade das classes, de 0 a 4 (por exemplo), e então mede-se a distância entre cada classse e ela sse torna o grau de (des)similaridade. 
+
+![similarity and dissimilarity for simple attributess](image/chapter2/1788896661680.png)
+
+##### dissimilarities between data objects
+
+##### similarities between data objects
