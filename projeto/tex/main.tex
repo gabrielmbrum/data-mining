@@ -1,135 +1,91 @@
 \documentclass{article}
 
-% Language setting
-% Replace `english' with e.g. `spanish' to change the document language
-\usepackage[english]{babel}
+% Idioma e codificação para português brasileiro
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 
-% Set page size and margins
-% Replace `letterpaper' with`a4paper' for UK/EU standard size
-\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+% Margens e tamanho do papel
+\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 
-% Useful packages
+% Pacotes úteis
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{booktabs}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
-\title{Your Paper}
-\author{You}
+\newcommand{\p}{\rule[-0.8mm]{20mm}{3.5mm}}
+
+\title{Caracterização de Padrões de Depreciação Automotiva sob a Transição Energética: Uma Abordagem Baseada em Representação Espacial de Séries Temporais}
+\author{Gabriel M. Brum}
+\date{2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Your abstract.
+Este trabalho investiga as dinâmicas temporais de depreciação de veículos automotores a partir do conjunto de dados fipeX , com foco no impacto da inserção de veículos elétricos (EVs) no mercado brasileiro frente aos modelos convencionais a combustão interna . Metodologicamente, o estudo aborda três questões centrais: (i) a verificação de assimetrias estatísticas nas taxas de depreciação entre elétricos e a combustão de mesma faixa de valor; (ii) a análise de co-movimento e efeitos de transbordamento decorrentes de guerras de preços e marcas entrantes ; e (iii) a avaliação comparativa entre a clusterização em séries temporais 1D tradicionais e representações bidimensionais geradas via \textit{Gramian Angular Field} (GAF) e \textit{Markov Transition Field} (MTF). A proposta visa unir a caracterização econômica de novos ativos à exploração de representações espaciais como estratégia de transformação de atributos em tarefas de mineração de dados não supervisionadas.
 \end{abstract}
 
-\section{Introduction}
+\section{Introdução}
 
-Your introduction goes here! Simply start writing your document and use the Recompile button to view the updated PDF preview. Examples of commonly used commands and features are listed below, to help you get started.
+O mercado automotivo global e brasileiro atravessa uma transição tecnológica impulsionada pela entrada acelerada de Veículos Elétricos (EVs) \cite{alvarez2024modelagem}. Diferente dos veículos a combustão interna (ICE), cujo comportamento de depreciação histórica é consolidado e linearizado pela idade do bem, os modelos eletrificados introduzem variáveis de incerteza operacional: degradação acelerada de baterias, rápida obsolescência tecnológica, políticas tarifárias voláteis e guerras de preços \cite{gautam2024depreciation, li2026global}.
 
-Once you're familiar with the editor, you can find various project setting in the Overleaf menu, accessed via the button in the very top left of the editor. To view tutorials, user guides, and further documentation, please visit our \href{https://www.overleaf.com/learn}{help library}, or head to our plans page to \href{https://www.overleaf.com/user/subscription/plans}{choose your plan}.
+Compreender e segmentar essas trajetórias temporais não é apenas uma demanda mercadológica de precificação e análise de risco para seguradoras e instituições financeiras; constitui um problema clássico de \textit{Data Mining} voltado à mineração de séries temporais (\textit{time-series mining}) e descoberta de padrões em dados ordenados. Métodos convencionais frequentemente achatam as curvas históricas ou dependem de distâncias euclidianas 1D que falham em capturar dinâmicas não lineares, flutuações sazonais e correlações defasadas entre segmentos concorrentes \cite{schloter2022empirical}.
 
-\section{Some examples to get started}
+A representação convencional de séries temporais como vetores unidimensionais impõe limitações analíticas severas ao processo de mineração de dados, restringindo os algoritmos de agrupamento a métricas de distância ponto a ponto altamente suscetíveis a ruídos, variações de escala e desalinhamentos temporais. Em dados ordenados complexos, como trajetórias de precificação de veículos, o tratamento vetorial tradicional desconsidera interações de vizinhança e estruturas não lineares inerentes às curvas de depreciação. Essa restrição metodológica fundamenta a necessidade de investigar transformações de atributos mais robustas, avaliando se representações bidimensionais geradas por \textit{Gramian Angular Fields} (GAF) ou \textit{Markov Transition Fields} (MTF) são capazes de codificar correlações cruzadas e dependências dinâmicas que escapam às distâncias euclidianas clássicas \cite{wu2023imaging, ulyanin2019feature}.
 
-\subsection{How to create Sections and Subsections}
+Sob o ponto de vista da modelagem estatística e do aprendizado de máquina, o estudo se justifica ao contrapor a eficácia de espaços latentes extraídos dessas imagens frente a métodos tradicionais de redução de dimensionalidade e seleção de atributos. A aplicação de matrizes GAF/MTF permite transpor o problema de dados tabulares temporais para o domínio de operadores de extração de padrões espaciais, abrindo caminho para testar se técnicas de aprendizado não supervisionado se beneficiam da preservação topológica dessas transformações \cite{jueco2024performance}. Com isso, o trabalho estabelece um teste empírico controlado para mensurar se a complexidade adicional dessa projeção espacial se traduz, de fato, em \textit{clusters} mais coesos e discriminantes do que os obtidos via abordagens vetoriais convencionais.
 
-Simply use the section and subsection commands, as in this example document! With Overleaf, all the formatting and numbering is handled automatically according to the template you've chosen. If you're using Rich Text mode, you can also create new section and subsections via the buttons in the editor toolbar.
+Por fim, o trabalho preenche uma lacuna relevante na análise de fenômenos de mercado ao estruturar a descoberta de padrões de desvalorização e possíveis efeitos de transbordamento decorrentes da chegada dos veículos elétricos e das montadoras chinesas \cite{li2025rise, abrardi2026market}. Ao analisar o co-movimento de preços entre matrizes energéticas concorrentes, a pesquisa vai além do agrupamento meramente exploratório e fornece um protocolo experimental rigoroso baseado em técnicas consolidadas de pré-processamento, mitigação do impacto de \textit{outliers} e validação de modelos. Dessa forma, a investigação entrega simultaneamente uma contribuição teórica sobre representação de dados ordenados na mineração de dados e uma ferramenta descritiva aplicada para precificação e gestão de risco sobre ativos automotivos.
 
-\subsection{How to include Figures}
+\section{Objetivos}
 
-First you have to upload the image file from your computer using the upload link in the file-tree menu. Then use the includegraphics command to include it in your document. Use the figure environment and the caption command to add a number and a caption to your figure. See the code for Figure \ref{fig:frog} in this section for an example.
-
-Note that your figure will automatically be placed in the most appropriate place for it, given the surrounding text and taking into account other figures or tables that may be close by. You can find out more about adding images to your documents in this help article on \href{https://www.overleaf.com/learn/how-to/Including_images_on_Overleaf}{including images on Overleaf}.
-
-% \begin{figure}
-% \centering
-% \includegraphics[width=0.3\textwidth]{frog.jpg}
-% \caption{\label{fig:frog}This frog was uploaded via the file-tree menu.}
-% \end{figure}
-
-\subsection{How to add Tables}
-
-Use the table and tabular environments for basic tables --- see Table~\ref{tab:widgets}, for example. For more information, please see this help article on \href{https://www.overleaf.com/learn/latex/tables}{tables}. 
-
-\begin{table}
-\centering
-\begin{tabular}{l|r}
-Item & Quantity \\\hline
-Widgets & 42 \\
-Gadgets & 13
-\end{tabular}
-\caption{\label{tab:widgets}An example table.}
-\end{table}
-
-\subsection{How to add Comments and Track Changes}
-
-Comments can be added to your project by highlighting some text and clicking ``Add comment'' in the top right of the editor pane. To view existing comments, click on the Review menu in the toolbar above. To reply to a comment, click on the Reply button in the lower right corner of the comment. You can close the Review pane by clicking its name on the toolbar when you're done reviewing for the time being.
-
-Track changes are available on all our \href{https://www.overleaf.com/user/subscription/plans}{premium plans}, and can be toggled on or off using the option at the top of the Review pane. Track changes allow you to keep track of every change made to the document, along with the person making the change. 
-
-\subsection{How to add Lists}
-
-You can make lists with automatic numbering \dots
-
-\begin{enumerate}
-\item Like this,
-\item and like this.
-\end{enumerate}
-\dots or bullet points \dots
 \begin{itemize}
-\item Like this,
-\item and like this.
+      \item \textbf{Mapear e quantificar as taxas de depreciação dos veículos elétricos:} Mensurar a velocidade e amplitude da perda de valor dos modelos eletrificados em comparação direta a veículos a combustão pareados por porte, categoria e faixa de preço de lançamento \cite{schloter2022empirical}.
+      
+      \item \textbf{Avaliar o efeito de transbordamento (\textit{spillover}) de marcas entrantes:} Analisar correlações temporais e possíveis quebras estruturais de preços em segmentos tradicionais após a introdução e guerra tarifária promovida por montadoras chinesas no mercado nacional \cite{li2026global, li2025rise}.
+
+      \item \textbf{Implementar e validar o \textit{reshaping} de séries temporais em imagens 2D:} Transformar as trajetórias unidimensionais de preços de cada veículo em representações matriciais utilizando algoritmos como \textit{Gramian Angular Field} (GAF) ou \textit{Markov Transition Field} (MTF) \cite{wu2023imaging, jueco2024performance}.
+
+      \item \textbf{Identificar e caracterizar arquétipos de desvalorização veicular:} Aplicar algoritmos de agrupamento (\textit{clustering}) sobre representações vetoriais clássicas e sobre os espaços latentes gerados a partir das imagens, identificando perfis comportamentais típicos (alta retenção, desvalorização acelerada, valorização tardia).
+
+      \item \textbf{Comparar empiricamente a eficácia das representações:} Avaliar quantitativamente, por meio de métricas de qualidade de agrupamento (como coeficiente de Silhueta e índice Davies-Bouldin), se a transformação das séries para imagem supera as abordagens vetoriais unidimensionais tradicionais.
 \end{itemize}
 
-\subsection{How to write Mathematics}
+\section{Atividades}
 
-\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
-\[S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
-      = \frac{1}{n}\sum_{i}^{n} X_i\]
-denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
+\begin{itemize}
+      \item \textbf{Atividade 1:} Coleta, limpeza e pré-processamento dos dados, tratamento de inconsistências/valores ausentes e estruturação temporal dos registros da base fipeX por veículo.
+      
+      \item \textbf{Atividade 2:} Análise exploratória e pareamento comparativo visualização das trajetórias de depreciação, cálculo de estatísticas descritivas e pareamento dos modelos elétricos com equivalentes a combustão para identificação de padrões preliminares.
+      
+      \item \textbf{Atividade 3:} Transformação e representação espacial (\textit{reshaping}), realizando a codificação das séries temporais 1D em representações matriciais 2D utilizando as técnicas de GAF e MTF.
+      
+      \item \textbf{Atividade 4:} Modelagem de agrupamento e extração de padrões aplicação e ajuste dos algoritmos de \textit{clustering} (K-Means e abordagens baseadas em densidade) tanto sobre os dados vetoriais clássicos quanto sobre as representações geradas por imagem.
 
+      \item \textbf{Atividade 5:} Avaliação experimental, interpretação e escrita final com o cálculo das métricas de validação de agrupamento, análise dos arquétipos comportamentais descobertos e consolidação dos resultados no artigo final.
+\end{itemize}
+  
+\section{Cronograma}
 
-\subsection{How to change the margins and paper size}
+\begin{table}[h]
+\centering
+\scalebox{0.82}{
+\begin{tabular}{||c||c|c|c|c|c|c||}
+\hline\hline
+\multicolumn{1}{||c||}{Atividades} & Semana 1 & Semana 2 & Semana 3 & Semana 4 & Semana 5 & Semana 6 \\ \hline\hline
+ 1 & \p &    &    &    &    &    \\ \hline
+ 2 &    & \p &    &    &    &    \\ \hline
+ 3 &    &    & \p &    &    &    \\ \hline
+ 4 &    &    &    & \p & \p &    \\ \hline 
+ 5 &    &    &    &    &    & \p \\ \hline \hline
+\end{tabular}}
+\caption{Cronograma de execução das atividades em semanas.}
+\label{tab:cronograma}
+\end{table}
 
-Usually the template you're using will have the page margins and paper size set correctly for that use-case. For example, if you're using a journal article template provided by the journal publisher, that template will be formatted according to their requirements. In these cases, it's best not to alter the margins directly.
-
-If however you're using a more general template, such as this one, and would like to alter the margins, a common way to do so is via the geometry package. You can find the geometry package loaded in the preamble at the top of this example file, and if you'd like to learn more about how to adjust the settings, please visit this help article on \href{https://www.overleaf.com/learn/latex/page_size_and_margins}{page size and margins}.
-
-\subsection{How to change the document language and spell check settings}
-
-Overleaf supports many different languages, including multiple different languages within one document. 
-
-To configure the document language, simply edit the option provided to the babel package in the preamble at the top of this example project. To learn more about the different options, please visit this help article on \href{https://www.overleaf.com/learn/latex/International_language_support}{international language support}.
-
-To change the spell check language, simply open the Overleaf menu at the top left of the editor window, scroll down to the spell check setting, and adjust accordingly.
-
-\subsection{How to add Citations and a References List}
-
-You can simply upload a \verb|.bib| file containing your BibTeX entries, created with a tool such as JabRef. You can then cite entries from it, like this: \cite{greenwade93}. Just remember to specify a bibliography style, as well as the filename of the \verb|.bib|. You can find a \href{https://www.overleaf.com/help/97-how-to-include-a-bibliography-using-bibtex}{video tutorial here} to learn more about BibTeX.
-
-If you have an \href{https://www.overleaf.com/user/subscription/plans}{upgraded account}, you can also import your Mendeley or Zotero library directly as a \verb|.bib| file, via the upload menu in the file-tree.
-
-\subsection{Good luck!}
-
-We hope you find Overleaf useful, and do take a look at our \href{https://www.overleaf.com/learn}{help library} for more tutorials and user guides! Please also let us know if you have any feedback using the Contact Us link at the bottom of the Overleaf menu --- or use the contact form at \url{https://www.overleaf.com/contact}.
-
-\bibliographystyle{alpha}
-\bibliography{sample}
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}
-About
-About us
-Careers
-Blog
-Solutions
-For business
-For universities
-For government
-For publishers
-Customer stories
-Learn
-Get started with LaTeX in Overleaf
-Templates
-Webinars
-Overleaf learning center
-How to insert images
