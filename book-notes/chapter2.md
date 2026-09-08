@@ -1,6 +1,6 @@
-## types of data
+## 2.1 types of data
 
-### attributes and object
+### 2.1.1 *attributes and object*
 
 é uma coleção de objetos de dados e seus atributos. um **atributo** é a propriedade ou características de um objeto. uma coleção de atributos descreve um **objeto**.
 
@@ -8,7 +8,7 @@
 - o mesmo atributo pode ser mapeado para diferentes valores de atributos
 - diferentes atributo podem ser mapeados para o mesmo conjunto de valores
 
-**medida de comproimento:** a forma que se mede um atributo talvez não seja a correta para as propriedades do atributo. um atributo pode ser medido de uma maneira em que não capture todas as propriedades do atributo.
+**medida de comprimento:** a forma que se mede um atributo talvez não seja a correta para as propriedades do atributo. um atributo pode ser medido de uma maneira em que não capture todas as propriedades do atributo.
 
 **tipos de atributos**
 - nominais (ex.: ID, cor do olho...)
@@ -30,7 +30,7 @@ o tipo de operação permitida é baseado no tipo de atributo.
 - simétrico: ambos os valores importam (ex.: gênero)
 - assimétrico: os valores não são igualmente importantes (ex.: um booleano que define se um estudante fez ou não uma materia na faculdade, a maioria é 0, o que mais importa é as que ele fez e tem 1)
 
-### types of *data sets*
+### 2.1.2 *types of data sets*
 
 **características chaves**
 - dimensionalidade: nuimero de atributos do objeto
@@ -70,17 +70,17 @@ tem duas vertentes: (i) o grafo captura a relação entre os objetos; (ii) os ob
 
 ---
 
-## data quality
+## 2.2 data quality
 
-### measurement and data issues
+### 2.2.1 *measurement and data collection issues*
 
-##### measurement and data collection errors
+#### *measurement and data collection errors*
 
 *measurement error* é o erro de medida, onde o valor registrado difere do valor real. 
 
 já o *data collection error* se refere ao erro de campos vazios ou inclusao de objetos que não pertencem ao domínio estudado. 
 
-##### noise and artifacts
+#### *noise and artifacts*
 
 *noise* é um erro de medida aleatório. causa a perda do formato de dados espaciais/temporais, e em domínios mais comuns (imagens e sinais) existem formas de remover esses ruídos. porém, na maioria dos casos foca-se em criar algoritmos robustos que produzam resultados aceitáveis mesmo com *noise*.
 
@@ -88,7 +88,7 @@ já o *data collection error* se refere ao erro de campos vazios ou inclusao de 
 
 ![noise](image/chapter2/noise.png)
 
-##### precision, bias and accuracy
+#### *precision, bias and accuracy*
 
 >*precision:* proximidade entre medidas repetidas de mesma grandeza
 
@@ -100,59 +100,59 @@ a precisão geralmente é medida pelo desvio padrão, já o bias pela diferença
 
 os digítos significantes são importantes, onde a quantidade de dígitos deve seguir o limite dos instrumentos de medida utilizados, sem aumentar a precisão sem ter certeza do valor que se está assumindo.
 
-#### outliers
+#### *outliers*
 
 são (i) instancias que tem características diferentes do restantes do conjunto ou (ii) valores de atributos que são incomuns de acordo com valores típicos do atributo. 
 
 são referidos também como anomalias, porém não podem ser confundidos com ruído, onde pode ser dados legitimos que são interessantes em detectar.
 
-#### missing values
+#### *missing values*
 
 a informação pode não ter sido coletada (ex.: alguem negou forneceu sua idade e peso), pode não ser aplicável para todos os objetos e vários outros motivos podem causar a falta de valores. há diversas maneiras para lidar com isso, como por exemplo:
 - eliminar instâncias/atributo vazio
 - estimando valores (interpolação)
 - igmorar valores vazios (ex.: ao calcular a proximidade, não utilziar os campos vazios)
 
-#### inconsistent values
+#### *inconsistent values*
 
 ex.: CEP que não corresponde a cidade atribuída ao objeto. 
 
 existem casos fáceis (altura e peso negativos), porém outros precisam ser consultados em fontes externas. 
 
-#### duplicate data
+#### *duplicate data*
 
 pode ser duplicatas identicas ou quase identicas. os mesmos dados podem aparecer diversas vezes porem com nomes diferentes. os processos que resolvem isso são chamados de *deduplication*.
 
-### issues related to applications
+### 2.2.2 *issues related to applications*
 
 >"os dados são de alta qualidade se forem utilizados no contexto correto"
 
-#### timeliness
+#### *timeliness*
 
 dados que representam valores de determinado período de tempo podem não ter mais qualidade após o período ter passado.  
 
-#### relevance
+#### *relevance*
 
 os dados precisam ter as informações necessárias para a aplicação, com um problema comum sendo o *sampling bias*, em que o recorte escolhido não representa o conjunto todo (perde-se proporções).
 
-#### knowledge about the data
+#### *knowledge about the data*
 
 idealmente os conjuntos de dados tem sua documentação, assim possibilitando uma compreensão correta de seus atributos. 
 
 ---
 
-## data preprocessing
+## 2.3 data preprocessing
 
 aggregation, sampling, feature subset selection, dimensionality reduction, feature creation, discretization and binarization, attribute transformation.
 
-### aggregation
+### 2.3.1 *aggregation*
 - combina dois ou mais objetos em um único (perde-se os detalhes)
 - atributos quantitativos são somados ou calculado a média (ex.: preço de vendas)
 - atributos categóricos são associadas a uma categoria mais macro (ex.: tv -> eletronicos)
 - ex.: agrupar as transacoes de vendas por loja, por data...
 - motivações: redução de dados, mudança de escala, mais "estabilidade" nos dados
 
-### sampling
+### 2.3.2 *sampling*
 - técnica de redução de dados, escolhe-se um subset dos objetos
 - usada para investigação preliminar dos dados, evitando altos custos de processamento do conjunto inteiro
 - usar uma amostra representativa funciona da mesma maneira que usar o dataset completo
@@ -172,7 +172,7 @@ quando-se tem diferentes tipos de objetos, com diferentes quantidades para cada 
 
 definir o tamanho da amostra pode ser difícil, então uma amostragem adaptativa ou progressiva é utilizada. define-se uma métrica de qualidade do sampling, por exemplo a acc de um modelo para cada amostra.
 
-### dimensionality reduction
+### 2.3.3 *dimensionality reduction*
 
 data sets com grandes quantidades de features (ex.: conjunto de documentos onde cada documento é representado por um vetor que tem as frequências de cada palavra utilizada no doc). reduzir a dimensionalidade elimina features irrelevantes e reduz ruído.
 
@@ -186,7 +186,8 @@ quanto mais dimensões os dados tem, se torna mais difícil de analisa-los. os d
 
 **Singular Value Decomposition (SVD)** é uma técnica de algebra linear que está relacionado ao PCA e também é utilizado para reduzir dimensionalidade. 
 
-### feature subset selecion
+### 2.3.4 *feature subset selecion*
+
 - reduz a dimensionaliadde dos dados
 - features redundantes e/ou irrelevantes são removidas 
 - a seleção de features tem como benefícios: reduzir tempo de treinamento; aumentar generalização -> reduzindo overfitting;
@@ -212,11 +213,11 @@ critério de parada são baseadas em uma ou mais das seguintes condições: (i) 
 
 após selecionar o subset, a validação final compara o algoritmo de data mining com o conjunto completo com o subset encontrado. 
 
-#### feature weighting
+#### *feature weighting*
 
 quão mais importante a feature, maior seu peso. pesos são dados baseado no conhecimento das features, ou podem ser atribuidos automaticamente. 
 
-### feature creation
+### 2.3.5 *feature creation*
 
 pode-se criar atributos para reduzir o total de atributos de um conjunto, visando manter os dados mais importantes. esse processo é específico por domínio, sendo raro a utilização de uma técnica em mais de um domínio. existem duas metodologias gerais:
 
@@ -226,7 +227,7 @@ pode-se criar atributos para reduzir o total de atributos de um conjunto, visand
 
 ![feat creation - fourier transf](image/chapter2/fourier-transf.png)
 
-### discretization and binarization
+### 2.3.6 *discretization and binarization*
 
 alguns algoritmos de data mining precisam dos dados em formatos categóricos. algoritmos que  encontrão padrões precisam de dados binzarizados.
 
@@ -266,7 +267,7 @@ a trnasformação de contínuo em categórico involve duas partes: (i) decidir q
 
 utiliza-se de conhecimento do domínio (ex.: temos um atributo de disciplinas em uma grande universidade, então agrupa-se por cursos, ou ainda mais, por departamentos). caso não seja possível,  ou produza resultados ruins, então usa-se  de  abbordagens empiricas, como  agrupar apenas as classes que ao serem unidas melhoram os resultados do algoritmo. 
 
-###  variable transformation
+### 2.3.7 *variable transformation*
 
 transformação aplicada a todos os valores de uma variável (atributo). 
 
@@ -274,19 +275,21 @@ transformação aplicada a todos os valores de uma variável (atributo).
 
 ***normalization or standardization*** utilizada para um conjunto de valores ter a mesma propriedade. por exemplo, comparar pessoas por meio de idade e renda, as idades tem um range muito menor que a rendam então precisa-se levar em conta isso. comumente utiliza-se a transformação de $x' = (x - \overline{x})/s_x$, onde $\overline{x}$ é a média do atributo e $s_x$ o desvio padrão. então se normaliza usando mediana e o desvio padrão absoluto (sendo $x$ uma variável, o *absolute standard deviation* é $\sigma_A = \sum_{i=1}^{m} |x_i - \mu|$, onde $x_i$ é o i-ésimo valor da variável, $m$ é o total de objetos, e $\mu$ é a média/mediana).
 
-### measures of similarity and dissimilarity
+--
+
+## 2.4 measures of similarity and dissimilarity
 
 são importantes pois são utilizadas em diversas técnicas de mineração, como *clustering*, classificação por vizinhos próximos e detecção de anomalias. 
 
-#### *basics*
+### 2.4.1 *basics*
 
-##### *definitions*
+#### *definitions*
 
 a **similaridade** é a medida numérica do grau em que dois objetos são parecidos. geralmente são valores não negativos, entre 0 e 1 (quanto mais próximo de 1, mais parecidos são os objetos).
 
 a **dissimilaridade** é a medida numérica do grau em que dois objetos são diferentes. frequentemente, o termo distância é dado como sinônimo dessa medida, porém este termo é apenas uma classe de dissimilaridade. algumas vezes estão na mesma escala de [0, 1], porém é comum que está entre 0 e +inf.
 
-##### *transformations*
+#### *transformations*
 
 frequentemente utilizadas para converter similaridade em dissimilaridade, ou vice versa, ou para transformar uma medida para um intervalo específico, ex.: [0, 1].
 
@@ -298,7 +301,7 @@ mapear medidas de proximidade para o intervalo [0, 1] pode mudar o significado d
 
 transformar similaridade em dissimilaridade pode ser feito por $d = 1 - s$, e existem várias outras fórmulas, onde o que deve ser mantido é que quanto maior o valor original, menor deve ser o valor resultante. 
 
-#### *similarity and dissimilarity between simple attributes*
+#### 2.4.2 *similarity and dissimilarity between simple attributes*
 
 atributos nominais tem sua similaridade booleana, com 1 sendo *match* e 0 caso contrário, já para a dissimilaridade é o contrário, mas seguem booleanos. 
 
@@ -306,6 +309,6 @@ objetos com um único atributo ordinal, a ordem deve ser levada em conta, como c
 
 ![similarity and dissimilarity for simple attributess](image/chapter2/1788896661680.png)
 
-##### dissimilarities between data objects
+#### 2.4.3 *dissimilarities between data objects*
 
-##### similarities between data objects
+#### 2.4.4 *similarities between data objects*
