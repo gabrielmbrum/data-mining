@@ -1,0 +1,128 @@
+\documentclass{article}
+
+% Idioma e codificação para português brasileiro
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Margens e tamanho do papel
+\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Pacotes úteis
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\newcommand{\p}{\rule[-0.8mm]{20mm}{3.5mm}}
+
+\title{Caracterização de Padrões de Depreciação Automotiva sob a Transição Energética: Uma Abordagem Baseada em Representação Espacial de Séries Temporais}
+\author{Gabriel M. Brum}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\textit{abstract}
+\end{abstract}
+
+\section{Introdução}
+
+Introdução.
+
+\section{Objetivos}
+
+\begin{itemize}
+      \item \textbf{Mapear e quantificar as taxas de depreciação dos veículos elétricos:} Mensurar a velocidade e amplitude da perda de valor dos modelos eletrificados em comparação direta a veículos a combustão pareados por porte, categoria e faixa de preço de lançamento \cite{schloter2022empirical}.
+      
+      \item \textbf{Avaliar o efeito de transbordamento (\textit{spillover}) de marcas entrantes:} Analisar correlações temporais e possíveis quebras estruturais de preços em segmentos tradicionais após a introdução e guerra tarifária promovida por montadoras chinesas no mercado nacional \cite{li2026global, li2025rise}.
+
+      \item \textbf{Implementar e validar o \textit{reshaping} de séries temporais em imagens 2D:} Transformar as trajetórias unidimensionais de preços de cada veículo em representações matriciais utilizando algoritmos como \textit{Gramian Angular Field} (GAF) ou \textit{Markov Transition Field} (MTF) \cite{wu2023imaging, jueco2024performance}.
+
+      \item \textbf{Identificar e caracterizar arquétipos de desvalorização veicular:} Aplicar algoritmos de agrupamento (\textit{clustering}) sobre representações vetoriais clássicas e sobre os espaços latentes gerados a partir das imagens, identificando perfis comportamentais típicos (alta retenção, desvalorização acelerada, valorização tardia).
+
+      \item \textbf{Comparar empiricamente a eficácia das representações:} Avaliar quantitativamente, por meio de métricas de qualidade de agrupamento (como coeficiente de Silhueta e índice Davies-Bouldin), se a transformação das séries para imagem supera as abordagens vetoriais unidimensionais tradicionais.
+\end{itemize}
+
+\section{Atividades}
+
+\begin{itemize}
+      \item \textbf{Atividade 1:} Coleta, limpeza e pré-processamento dos dados, tratamento de inconsistências/valores ausentes e estruturação temporal dos registros da base fipeX por veículo.
+      
+      \item \textbf{Atividade 2:} Análise exploratória e pareamento comparativo visualização das trajetórias de depreciação, cálculo de estatísticas descritivas e pareamento dos modelos elétricos com equivalentes a combustão para identificação de padrões preliminares.
+      
+      \item \textbf{Atividade 3:} Transformação e representação espacial (\textit{reshaping}), realizando a codificação das séries temporais 1D em representações matriciais 2D utilizando as técnicas de GAF e MTF.
+      
+      \item \textbf{Atividade 4:} Modelagem de agrupamento e extração de padrões aplicação e ajuste dos algoritmos de \textit{clustering} (K-Means e abordagens baseadas em densidade) tanto sobre os dados vetoriais clássicos quanto sobre as representações geradas por imagem.
+
+      \item \textbf{Atividade 5:} Avaliação experimental, interpretação e escrita final com o cálculo das métricas de validação de agrupamento, análise dos arquétipos comportamentais descobertos e consolidação dos resultados no artigo final.
+\end{itemize}
+  
+\section{Resultados}
+
+Nesta seção serão apresentados os resultados a partir de cada uma das atividades propostas.
+
+\subsection{Atividade 1}
+
+Inicialmente, a base de dados foi carregada via arquivo Parquet, contendo 9.276.121 registros, então foram removidas 83 instâncias duplicadas. Após isso, foram removidos 498.374 registros que possuíam colunas vazias, que neste conjunto eram todas causadas pela coluna \texttt{ano\_modelo}, e mais 21 registros foram removidos por apresentaram \texttt{valor\_centavos} zerado. As colunas presentes no \textit{dataset} estão estruturadas e tipadas conforme detalhado na Tabela \ref{tab:atributos_dataset}, que apresenta o nome de cada atributo, sua respectiva tipagem no Polars e uma amostra de valor extraída do conjunto limpo.
+
+\begin{table}[htpb]
+    \centering
+    \caption{Atributos do \textit{dataset}, tipos de dados e exemplos de valores.}
+    \label{tab:atributos_dataset}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{Atributo} & \textbf{Tipo de Dado} & \textbf{Exemplo de Valor} \\
+        \hline
+        \texttt{tipo\_veiculo} & \texttt{str} (String) & moto \\
+        \texttt{codigo\_fipe} & \texttt{str} (String) & 840015-6 \\
+        \texttt{nome\_modelo} & \texttt{str} (String) & ATV 100 \\
+        \texttt{nome\_marca} & \texttt{str} (String) & ADLY \\
+        \texttt{nome\_combustivel} & \texttt{str} (String) & Gasolina \\
+        \texttt{sigla\_combustivel} & \texttt{str} (String) & g \\
+        \texttt{ano\_modelo} & \texttt{i64} (Inteiro de 64 bits) & 1990 \\
+        \texttt{zero\_km} & \texttt{bool} (Booleano) & False \\
+        \texttt{valor\_centavos} & \texttt{i64} (Inteiro de 64 bits) & 0 \\
+        \texttt{valor\_formatado} & \texttt{str} (String) & R\$ 0,00 \\
+        \texttt{mes\_referencia} & \texttt{i32} (Inteiro de 32 bits) & 9 \\
+        \texttt{ano\_referencia} & \texttt{i32} (Inteiro de 32 bits) & 2012 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Como pré-processamento, foi aplicado o filtro para apenas véiculos que tenham \texttt{tipo\_veiculo} igual a \texttt{carro}, que é o foco do trabalho, assim reduzindo para apenas 3372197 registros. Após isso, foi feita uma seleção de subconjunto de \textit{features}, removendo as colunas \texttt{nome\_combustivel} e \texttt{valor\_formatado}, que são redundantes com \texttt{sigla\_combustivel} e \texttt{valor\_centavos}, a Tabela \ref{tab:atributos_dataset} relata sobre a descrição e quantidade de amostras para cada sigla de combustível. Também foi realizada a agregação das colunas \texttt{ano\_referencia} e \texttt{mes\_referencia} em uma única coluna de data, chamada \texttt{data\_referencia}, que representa o primeiro dia do mês de referência, e as colunas originais foram descartadas. Para uma noção temporal da quantidade total e de cada tipo de combustível, a Figura \ref{fig:quantidade_amostras_por_combustivel} apresenta a distribuição logarítimica temporal da quantidade total e subdividida em tipos de combustível de registros de carros.
+
+\begin{table}[htpb]
+    \centering
+    \caption{Mapeamento das siglas de combustível e quantidade de amostras por categoria.}
+    \label{tab:distribuicao_combustivel}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{clr}
+        \hline
+        \textbf{Sigla} & \textbf{Combustível} & \textbf{Quantidade de Amostras} \\
+        \hline
+        \texttt{g} & Gasolina & 3.522.986 \\
+        \texttt{d} & Diesel & 873.341 \\
+        \texttt{f} & Flex & 827.243 \\
+        \texttt{e} & Álcool & 128.721 \\
+        \texttt{h} & Híbrido & 35.033 \\
+        \texttt{l} & Elétrico & 15.294 \\
+        \texttt{n} & Gás Natural & 2.849 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\columnwidth]{../../output/distribuicao_temporal_log.png}
+    \caption{Distribuição temporal logarítimica da quantidade total e subdividida em tipos de combustível de registros de carros.}
+    \label{fig:quantidade_amostras_por_combustivel}
+\end{figure}
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
