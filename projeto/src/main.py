@@ -507,9 +507,10 @@ def run_eda(df: pl.DataFrame, output_dir: Path) -> None:
     # plot_temporal_distribution(df, output_dir)
     # analyze_recent_concentration(df, output_dir)
     # check_multiple_t0_records(df)
-    # plot_depreciation_curves(df, output_dir)
-    # plot_yoy_depreciation_by_calendar_year(df, output_dir)
-    analyze_price_brackets(df, output_dir)
+    plot_depreciation_curves(df, output_dir)
+    plot_yoy_depreciation_by_calendar_year(df, output_dir)
+    # analyze_price_brackets(df, output_dir)
+    run_segmented_price_analysis(df, output_dir)
 
 
 def check_multiple_t0_records(df: pl.DataFrame) -> None:
@@ -599,7 +600,12 @@ def calculate_value_retention(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-def plot_depreciation_curves(df: pl.DataFrame, output_dir: Path) -> None:
+def plot_depreciation_curves(
+    df: pl.DataFrame,
+    output_dir: Path,
+    title_suffix: str = "",
+    filename_suffix: str = "",
+) -> None:
     """
     Plots the high-resolution average depreciation curves by age in months.
     """
@@ -647,15 +653,15 @@ def plot_depreciation_curves(df: pl.DataFrame, output_dir: Path) -> None:
                 linewidth=linewidth,
             )
 
-    # ax.set_title(
-    #     "Average Vehicle Depreciation Curves by Fuel Type (Monthly Resolution)",
-    #     fontsize=13,
-    #     fontweight="bold",
-    # )
+    ax.set_title(
+        f"Average Vehicle Depreciation Curves by Fuel Type{title_suffix}",
+        fontsize=13,
+        fontweight="bold",
+    )
     ax.set_xlabel("Vehicle Age (Months)", fontsize=11)
     ax.set_ylabel("Value Retention Rate (%)", fontsize=11)
 
-    ax.set_ylim(bottom=0, top=105)
+    ax.set_ylim(bottom=0, top=150)
 
     # Eixo X configurado para apresentar marcadores de 24 em 24 meses (2 anos)
     if ages_months:
@@ -666,14 +672,19 @@ def plot_depreciation_curves(df: pl.DataFrame, output_dir: Path) -> None:
 
     plt.tight_layout()
     output_dir.mkdir(parents=True, exist_ok=True)
-    file_path = output_dir / "depreciation_curves_monthly.png"
+    file_path = output_dir / f"depreciation_curves_monthly{filename_suffix}.png"
     plt.savefig(file_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
     print(f"High-resolution depreciation curves chart successfully saved: {file_path}")
 
 
-def plot_yoy_depreciation_by_calendar_year(df: pl.DataFrame, output_dir: Path) -> None:
+def plot_yoy_depreciation_by_calendar_year(
+    df: pl.DataFrame,
+    output_dir: Path,
+    title_suffix: str = "",
+    filename_suffix: str = "",
+) -> None:
     """
     Calculates and plots the Year-over-Year (YoY) average price change
     by calendar year and fuel type to analyze macroeconomic market trends.
@@ -759,7 +770,7 @@ def plot_yoy_depreciation_by_calendar_year(df: pl.DataFrame, output_dir: Path) -
             )
 
     ax.set_title(
-        "Macroeconomic Trend: YoY Average Price Change by Fuel Type",
+        f"Macroeconomic Trend: YoY Average Price Change{title_suffix}",
         fontsize=13,
         fontweight="bold",
     )
@@ -780,7 +791,7 @@ def plot_yoy_depreciation_by_calendar_year(df: pl.DataFrame, output_dir: Path) -
             x_text_pos,
             0.5,
             " Appreciation",
-            color="green",
+            color="gray",
             verticalalignment="bottom",
             fontweight="bold",
             fontsize=10,
@@ -789,7 +800,7 @@ def plot_yoy_depreciation_by_calendar_year(df: pl.DataFrame, output_dir: Path) -
             x_text_pos,
             -0.5,
             " Depreciation",
-            color="red",
+            color="gray",
             verticalalignment="top",
             fontweight="bold",
             fontsize=10,
@@ -802,7 +813,7 @@ def plot_yoy_depreciation_by_calendar_year(df: pl.DataFrame, output_dir: Path) -
 
     plt.tight_layout()
     output_dir.mkdir(parents=True, exist_ok=True)
-    file_path = output_dir / "macro_depreciation_yoy.png"
+    file_path = output_dir / f"macro_depreciation_yoy{filename_suffix}.png"
     plt.savefig(file_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
@@ -929,6 +940,77 @@ def analyze_price_brackets(df: pl.DataFrame, output_dir: Path) -> None:
     plt.close(fig)
 
     print(f"Price brackets boxplot successfully saved: {file_path}")
+
+
+def run_segmented_price_analysis(df: pl.DataFrame, output_dir: Path) -> None:
+    """
+    Segments the post-2018 cohort into Entry, Mid-range, and Luxury brackets
+    based on global market launch prices, then runs the depreciation plots
+    for each segment to ensure fair empirical matching.
+    """
+    print("\n--- Segmenting Cohort (>= 2019) by Global Launch Price ---")
+
+    # 1. Filtra a coorte de interesse (como decidido pela sua análise)
+    df_recent = df.filter(pl.col("ano_lancamento") >= 2019)
+
+    # 2. Encontra o Q1 e Q3 GLOBAIS isolando cada veículo único
+    # (para não dar peso extra a carros que ficaram mais meses na tabela)
+    df_prices = df_recent.select(
+        ["codigo_fipe", "ano_modelo", "sigla_combustivel", "preco_lancamento"]
+    ).unique()
+
+    q1 = df_prices["preco_lancamento"].quantile(0.25)
+    q3 = df_prices["preco_lancamento"].quantile(0.75)
+
+    print(f"Limiar Global Q1 (Fim da linha de Entrada): R$ {q1 / 100:,.2f}")
+    print(f"Limiar Global Q3 (Início da linha de Luxo): R$ {q3 / 100:,.2f}")
+
+    # 3. Rotula o dataframe principal com as faixas de preço
+    df_segmented = df_recent.with_columns(
+        pl.when(pl.col("preco_lancamento") <= q1)
+        .then(pl.lit("Entrada"))
+        .when(pl.col("preco_lancamento") <= q3)
+        .then(pl.lit("Intermediario"))
+        .otherwise(pl.lit("Luxo"))
+        .alias("segmento_preco")
+    )
+
+    # 4. Itera sobre cada segmento gerando os gráficos de comparação justa
+    segments = ["Entrada", "Intermediario", "Luxo"]
+
+    for seg in segments:
+        print(f"\n>> Processando Segmento: {seg} <<")
+        df_seg = df_segmented.filter(pl.col("segmento_preco") == seg)
+
+        if df_seg.height == 0:
+            print(f"Nenhum registro encontrado no segmento {seg}.")
+            continue
+
+        # Imprime quais matrizes energéticas efetivamente existem neste segmento
+        counts = df_seg.select(
+            ["codigo_fipe", "ano_modelo", "sigla_combustivel"]
+        ).unique()
+        with pl.Config(tbl_rows=-1):
+            print(counts.group_by("sigla_combustivel").len())
+
+        # Cria uma sub-pasta para não desorganizar o seu diretório de output
+        seg_dir = output_dir / seg
+        seg_dir.mkdir(parents=True, exist_ok=True)
+
+        # Chama as funções passando os sufixos para identificar visualmente a categoria
+        plot_depreciation_curves(
+            df_seg,
+            output_dir=seg_dir,
+            title_suffix=f" - Segmento: {seg}",
+            filename_suffix=f"_{seg.lower()}",
+        )
+
+        plot_yoy_depreciation_by_calendar_year(
+            df_seg,
+            output_dir=seg_dir,
+            title_suffix=f" - Segmento: {seg}",
+            filename_suffix=f"_{seg.lower()}",
+        )
 
 
 # ==========================================
