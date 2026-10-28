@@ -1,0 +1,14 @@
+\section{Atividade 1: Pré-processamento e Limpeza de Dados}
+
+A base de dados bruta (fipeX) foi carregada contendo originalmente mais de 9,2 milhões de registros. Como etapa inicial de limpeza estrutural, instâncias inteiramente duplicadas e registros com o atributo \textit{valor\_centavos} igual a zero foram removidos. O escopo do projeto foi então restrito ao segmento de interesse, aplicando-se um filtro para manter apenas os registros com \textit{tipo\_veiculo} correspondente a carros, o que reduziu a base para aproximadamente 3,3 milhões de instâncias.
+
+Para viabilizar a análise de séries temporais, os atributos de \textit{ano\_referencia} e \textit{mes\_referencia} foram agregados em uma única variável \textit{data\_referencia}, que está formatada em \textit{yyyy-mm-dd} e como não existia o dia exato da coleta, foi considerada o primeiro dia do mês. Além disso, realizou-se a seleção de atributos (\textit{feature selection}) descartando as seguintes colunas redundantes e/ou desnecessárias para a análise:
+\begin{itemize}
+    \item \textit{valor\_formatado} que tem redundância com \textit{valor\_centavos};
+    \item \textit{nome\_combustivel} que tem redundância com \textit{sigla\_combustivel};
+    \item \textit{zero\_km} que consegue ser inferido a partir do \textit{ano\_modelo} e da \textit{data\_referencia};
+    \item \textit{tipo\_veiculo} que após os filtros iniciais só possui amostras de carros.
+\end{itemize}
+
+
+Durante o pré-processamento, antes de remover definitivamente a coluna \textit{zero\_km}, observou-se que uma quantidade expressiva de registros referentes a veículos novos (\textit{zero\_km = true}) apresentava valores ausentes na coluna \textit{ano\_modelo}. Para evitar o descarte desses registros e a consequente perda do preço base de lançamento, aplicou-se uma técnica de imputação baseada em conhecimento de domínio \cite{tan2019introduction}. O \textit{ano\_modelo} desses veículos foi inferido e preenchido com o ano correspondente extraído da sua \textit{data\_referencia}. Tal procedimento assegura o alinhamento de fase e a correta ancoragem da idade inicial do ativo em zero, eliminando o viés de seleção que ocorreria caso todos os preços de lançamento fossem excluídos do \textit{dataset}.

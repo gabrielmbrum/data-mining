@@ -1,0 +1,13 @@
+{
+  "window_months": 64,
+  "image_size": 64,
+  "n_vehicles": 1954,
+  "min_launch_year": 2019,
+  "vrr_scale_max": 1.5,
+  "clipped_fraction": 0.027323758955987716,
+  "mtf_bins": 8,
+  "mtf_strategy": "quantile",
+  "max_gap_frac": 0.1,
+  "q1_reais": 108934.0,
+  "q3_reais": 400110.0
+}
