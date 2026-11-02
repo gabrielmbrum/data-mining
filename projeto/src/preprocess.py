@@ -134,6 +134,12 @@ def preprocess_data(df: pl.DataFrame) -> pl.DataFrame:
     # Extrai o ano de lançamento para o filtro da coorte (max_age)
     df = df.with_columns(pl.col("data_lancamento").dt.year().alias("ano_lancamento"))
 
+    # NOVO FILTRO: Remove carros antigos que tiveram a 1ª cotação muito depois do ano do modelo
+    raw_before_late = df.height
+    df = df.filter((pl.col("ano_lancamento") - pl.col("ano_modelo")) <= 1)
+    late_removed = raw_before_late - df.height
+    print(f"Late-listed old vehicles removed: {late_removed:,}")
+
     # idade em anos
     df = df.with_columns(
         (pl.col("data_referencia").dt.year() - pl.col("ano_lancamento")).alias(
@@ -153,7 +159,7 @@ def preprocess_data(df: pl.DataFrame) -> pl.DataFrame:
         ).alias("idade_meses")
     )
 
-    df = df.drop(["tipo_veiculo", "valor_formatado", "nome_combustivel", "zero_km"])
+    df = df.drop(["tipo_veiculo", "valor_formatado", "nome_combustivel"])
     df = df.filter(
         (pl.col("sigla_combustivel") != "n") & (pl.col("sigla_combustivel") != "e")
     )
@@ -174,9 +180,11 @@ def calculate_value_retention(df: pl.DataFrame) -> pl.DataFrame:
 
     cohort_keys = ["codigo_fipe", "ano_modelo", "sigla_combustivel"]
 
-    # Isola o mês exato de estreia (idade_meses == 0)
+    # Isola o mês exato de estreia (idade_meses == 0) e garante que a 
+    # âncora seja o preço zero_km (ou o mais alto) ordenando antes de pegar o primeiro.
     df_base_price = (
         df.filter(pl.col("idade_meses") == 0)
+        .sort(["zero_km", "valor_centavos"], descending=[True, True])
         .group_by(cohort_keys)
         .first()
         .select(cohort_keys + [pl.col("valor_centavos").alias("preco_lancamento")])

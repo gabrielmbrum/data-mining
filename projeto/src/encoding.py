@@ -94,6 +94,7 @@ def build_series_matrix(
         df_recent.group_by(COHORT_KEYS)
         .agg(
             [
+                pl.col("nome_modelo").first(),
                 pl.col("nome_marca").first(),
                 pl.col("ano_lancamento").first(),
                 pl.col("data_lancamento").first(),
@@ -249,20 +250,30 @@ def plot_encoding_examples(
     meta: pl.DataFrame,
     window: int,
     file_path: Path,
+    group_by: str = "fuel",
     seed: int = 42,
 ) -> None:
     """
-    Saves a grid with one random Electric, one Hybrid and one Gasoline vehicle,
+    Saves a grid with one random vehicle from each group.
+    group_by can be "fuel" (l, h, g) or "segment" (Entrada, Intermediario, Luxo).
     showing the VRR series and its GASF, GADF and MTF images.
     """
     rng = np.random.default_rng(seed)
-    fuel_col = meta["sigla_combustivel"].to_numpy()
-    fuels = [f for f in ("l", "h", "g") if (fuel_col == f).any()]
-    if not fuels:
+    
+    if group_by == "fuel":
+        group_col = meta["sigla_combustivel"].to_numpy()
+        target_groups = ("l", "h", "g")
+    else:
+        group_col = meta["segmento_preco"].to_numpy()
+        target_groups = ("Entrada", "Intermediario", "Luxo")
+        
+    groups_to_plot = [g for g in target_groups if (group_col == g).any()]
+    
+    if not groups_to_plot:
         return
 
     fig, axes = plt.subplots(
-        len(fuels), 4, figsize=(15, 3.6 * len(fuels)), squeeze=False
+        len(groups_to_plot), 4, figsize=(15, 3.6 * len(groups_to_plot)), squeeze=False
     )
     months = np.arange(window)
     panels = [
@@ -271,14 +282,30 @@ def plot_encoding_examples(
         (mtf, 0.0, 1.0, "MTF"),
     ]
 
-    for r, fuel in enumerate(fuels):
-        k = int(rng.choice(np.flatnonzero(fuel_col == fuel)))
+    for r, g_val in enumerate(groups_to_plot):
+        k = int(rng.choice(np.flatnonzero(group_col == g_val)))
         row = meta.row(k, named=True)
 
         ax = axes[r, 0]
         ax.plot(months, series[k] * 100, color="black", linewidth=1.8)
+        
+        # Formatação do rótulo
+        display_group = FUEL_TYPES_MAP.get(g_val, g_val) if group_by == "fuel" else g_val
+        
+        # Limita o tamanho do nome do carro para não quebrar o layout
+        car_name = row['nome_modelo']
+        if len(car_name) > 22:
+            car_name = car_name[:19] + "..."
+            
+        # Calcula o mês final baseado na data de lançamento e na janela de tempo
+        start_date = row['data_lancamento']
+        end_month = start_date.month - 1 + window
+        end_year = start_date.year + end_month // 12
+        end_month = end_month % 12 + 1
+        end_date_str = f"{end_year}-{end_month:02d}"
+        
         ax.set_ylabel(
-            f"{FUEL_TYPES_MAP.get(fuel, fuel)}\nFIPE {row['codigo_fipe']} / {row['ano_modelo']}",
+            f"{display_group}\n{car_name}\n({start_date.strftime('%Y-%m')} a {end_date_str})",
             fontsize=9,
         )
         ax.grid(True, linestyle=":", alpha=0.6)
@@ -384,7 +411,11 @@ def run_encoding(
             json.dump(config, f, indent=2)
 
         plot_encoding_examples(
-            series, gasf, gadf, mtf, vehicles, window, window_dir / "examples.png"
+            series, gasf, gadf, mtf, vehicles, window, window_dir / "examples_fuel.png", group_by="fuel"
+        )
+        
+        plot_encoding_examples(
+            series, gasf, gadf, mtf, vehicles, window, window_dir / "examples_segments.png", group_by="segment"
         )
 
         print(

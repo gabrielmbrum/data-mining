@@ -5,7 +5,6 @@ import polars as pl
 
 from preprocess import FUEL_TYPES_MAP
 
-
 # ==========================================
 # EXPLORATORY DATA ANALYSIS (EDA)
 # ==========================================
@@ -999,9 +998,9 @@ def run_eda(df: pl.DataFrame, output_dir: Path) -> None:
     # plot_vehicle_age_distribution(df, output_dir)
     # plot_temporal_distribution(df, output_dir)
     # analyze_recent_concentration(df, output_dir)
-    # check_multiple_t0_records(df)
+    check_multiple_t0_records(df)
     # plot_depreciation_curves(df, output_dir)
     # plot_yoy_depreciation_by_calendar_year(df, output_dir)
-    analyze_series_length_coverage(df, output_dir)
-    analyze_price_brackets(df, output_dir)
-    run_segmented_price_analysis(df, output_dir)
+    # analyze_series_length_coverage(df, output_dir)
+    # analyze_price_brackets(df, output_dir)
+    # run_segmented_price_analysis(df, output_dir)

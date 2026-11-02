@@ -5,7 +5,11 @@ import polars as pl
 from preprocess import clean_data, preprocess_data, calculate_value_retention
 from eda import run_eda
 from encoding import run_encoding
-
+from diagnostics import (
+    diagnose_t0_duplicates,
+    diagnose_zero_km_streams,
+    diagnose_model_year_vs_launch,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ASSETS_DIR = BASE_DIR / "assets"
@@ -33,7 +37,11 @@ def main():
     df = clean_data(df)
     df = preprocess_data(df)
     df = calculate_value_retention(df)
-    # run_eda(df, OUTPUT_DIR)
+
+    diagnose_t0_duplicates(df)
+    diagnose_zero_km_streams(df)
+    diagnose_model_year_vs_launch(df)
+    run_eda(df, OUTPUT_DIR)
     run_encoding(df, OUTPUT_DIR / "encoding")
 
 
