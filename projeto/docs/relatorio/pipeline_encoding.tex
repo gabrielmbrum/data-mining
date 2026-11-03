@@ -1,0 +1,84 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.85\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        % Estilos (mesmos do pipeline1.tex)
+        recntagle/.style={
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        title_block/.style={
+            rectangle, rounded corners=3pt, inner sep=4.5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {
+            thick, ->, >={Stealth[length=2.5mm]}
+        },
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small
+        },
+        embed_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            draw=black!70, fill=blue!15, line width=0.7pt, font=\small\bfseries
+        },
+        file_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=white, line width=0.7pt, font=\footnotesize
+        }
+    ]
+
+        % 1. Entrada de dados
+        \node (input) [recntagle, minimum width=5cm] {1. Dados FIPE (\texttt{.parquet})};
+
+        % 2. PRÉ-PROCESSAMENTO
+        \node (pre_box) [box_delimitador, minimum width=13cm, minimum height=2.8cm, below=0.8cm of input] {};
+        \node (pre_title) [title_block] at (pre_box.north) {2. Pré-processamento};
+
+        \node (clean) [sub_block, text width=5.2cm] at ([xshift=-3.4cm, yshift=-0.35cm]pre_box.center) {Limpeza e filtros\\(duplicados, valor zero,\\carros, marcas relevantes)};
+        \node (vrr) [sub_block, text width=5.2cm] at ([xshift=3.4cm, yshift=-0.35cm]pre_box.center) {Taxa de Retenção de Valor (VRR)\\ancorada no mês zero\\($\mathrm{VRR}_t = \mathrm{valor}_t / \mathrm{valor}_0$)};
+
+        \draw [arrow] (input.south) -- (pre_title.north);
+        \draw [arrow] (clean.east) -- (vrr.west);
+
+        % 3. CONSTRUÇÃO DAS SÉRIES
+        \node (series_box) [box_delimitador, minimum width=13cm, minimum height=3.0cm, below=0.8cm of pre_box] {};
+        \node (series_title) [title_block] at (series_box.north) {3. Construção das Séries};
+
+        \node (window) [sub_block, text width=3.5cm] at ([xshift=-4.4cm, yshift=-0.35cm]series_box.center) {Janelas\\$T \in \{24, 32, 48, 64\}$ meses\\(lançamento $\geq$ 2019)};
+        \node (interp) [sub_block, text width=3.5cm] at ([xshift=0cm, yshift=-0.35cm]series_box.center) {Interpolação linear\\(descarta séries com\\$>$ 10\% de meses faltantes)};
+        \node (scale) [sub_block, text width=3.5cm] at ([xshift=4.4cm, yshift=-0.35cm]series_box.center) {Escala global\\$\mathrm{VRR}/1{,}5$ em $[0,1]$\\(com \textit{clipping})};
+
+        \draw [arrow] (pre_box.south) -- (series_title.north);
+        \draw [arrow] (window.east) -- (interp.west);
+        \draw [arrow] (interp.east) -- (scale.west);
+
+        % 4. CODIFICAÇÃO EM IMAGENS
+        \node (enc_box) [box_delimitador, minimum width=13cm, minimum height=3.2cm, below=0.8cm of series_box] {};
+        \node (enc_title) [title_block] at (enc_box.north) {4. Codificação 2D ($T \times T$, sem PAA)};
+
+        \node (gasf) [embed_block, text width=3.5cm] at ([xshift=-4.4cm, yshift=-0.35cm]enc_box.center) {GASF\\{\footnotesize\mdseries $\cos(\phi_i + \phi_j)$}};
+        \node (gadf) [embed_block, text width=3.5cm] at ([xshift=0cm, yshift=-0.35cm]enc_box.center) {GADF\\{\footnotesize\mdseries $\sin(\phi_i - \phi_j)$}};
+        \node (mtf) [embed_block, text width=3.5cm] at ([xshift=4.4cm, yshift=-0.35cm]enc_box.center) {MTF\\{\footnotesize\mdseries 8 \textit{bins} de quantis}};
+
+        \draw [arrow] (series_box.south) -- (enc_title.north);
+
+        % 5. SAÍDAS
+        \node (out_box) [box_delimitador, minimum width=13cm, minimum height=3.2cm, below=0.8cm of enc_box] {};
+        \node (out_title) [title_block] at (out_box.north) {5. Saídas por Janela (\texttt{window\_TT/})};
+
+        \node (f_img) [file_block, text width=2.6cm] at ([xshift=-4.65cm, yshift=-0.35cm]out_box.center) {\texttt{gasf.npy}\\\texttt{gadf.npy}\\\texttt{mtf.npy}\\$(N, T, T)$};
+        \node (f_ser) [file_block, text width=2.6cm] at ([xshift=-1.55cm, yshift=-0.35cm]out_box.center) {\texttt{series\_vrr.npy}\\$(N, T)$\\(bases Euclidiana/DTW)};
+        \node (f_meta) [file_block, text width=2.6cm] at ([xshift=1.55cm, yshift=-0.35cm]out_box.center) {\texttt{metadata.parquet}\\+ segmento de preço\\(Entrada / Interm. / Luxo)};
+        \node (f_cfg) [file_block, text width=2.6cm] at ([xshift=4.65cm, yshift=-0.35cm]out_box.center) {\texttt{config.json}\\\texttt{examples\_*.png}};
+
+        \draw [arrow] (enc_box.south) -- (out_title.north);
+
+    \end{tikzpicture}%
+    }
+    \caption{Fluxo da metodologia de codificação das séries de retenção de valor (VRR) em imagens GASF, GADF e MTF.}
+    \label{fig:pipeline_encoding}
+\end{figure}
