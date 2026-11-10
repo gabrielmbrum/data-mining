@@ -1,0 +1,217 @@
+\section{Atividade 4: Modelagem de Agrupamento e Extração de Padrões}
+
+A presente atividade compreende a aplicação e a comparação empírica de técnicas de agrupamento (\textit{clustering}) não supervisionado para a descoberta de padrões e arquétipos comportamentais de depreciação veicular. Para tanto, estabelece-se uma linha de base (\textit{baseline}) operando diretamente no domínio temporal unidimensional (1D) das séries de Taxa de Retenção de Valor (VRR) sob métricas euclidianas e de \textit{Dynamic Time Warping} (DTW), confrontando-a com os agrupamentos extraídos dos espaços latentes gerados pelas codificações matriciais bidimensionais (2D) desenvolvidas na Atividade~3 (\textit{Gramian Angular Fields} e \textit{Markov Transition Fields}).
+
+\subsection{Fundamentação Teórica}
+
+Conforme formalizado na literatura clássica de mineração de dados \cite{tan2019introduction}, a análise de agrupamento visa particionar uma coleção de objetos não rotulados em subconjuntos homogêneos (clusters), de modo que a similaridade intraclasse seja maximizada e a similaridade interclasse seja minimizada.
+
+\subsubsection{Taxonomia de Agrupamentos e Tipos de Clusters}
+
+A literatura estabelece distinções conceituais fundamentais quanto à organização e à topologia dos grupos gerados \cite{tan2019introduction}:
+\begin{itemize}
+    \item \textbf{Particional vs. Hierárquico:} Um agrupamento particional divide os dados em subconjuntos disjuntos e não sobrepostos, de modo que cada objeto pertença a exatamente um grupo. Em contrapartida, abordagens hierárquicas constroem uma árvore aninhada de partições (dendrograma), permitindo múltiplos níveis de granularidade.
+    \item \textbf{Exclusivo vs. Não-Exclusivo (Fuzzy):} No particionamento estrito (exclusivo), a pertinência é binária ($x_i \in C_j$). No modelo \textit{fuzzy}, cada ponto possui um grau de pertinência $\mu_{ij} \in [0, 1]$ em relação a cada cluster, com $\sum_j \mu_{ij} = 1$.
+    \item \textbf{Completo vs. Parcial:} Enquanto métodos completos alocam compulsoriamente todos os pontos a algum agrupamento, métodos parciais identificam e isolam instâncias anômalas como ruído (\textit{noise}), característica central de algoritmos baseados em densidade.
+\end{itemize}
+
+Quanto à definição da natureza dos grupos, distinguem-se quatro classes fundamentais:
+\begin{enumerate}
+    \item \textbf{Well-separated (Bem separados):} Cada ponto está mais próximo de todos os pontos de seu próprio cluster do que de qualquer ponto pertencente a clusters externos.
+    \item \textbf{Center-based (Baseados em centro):} Cada objeto está mais próximo do centro de seu grupo do que do centro de qualquer outro grupo. O centro pode ser formalizado como um \textit{centróide} (média ou mediana dos atributos do grupo) ou um \textit{medóide} (objeto real pertencente à amostra que minimiza a soma das distâncias aos demais pontos do cluster).
+    \item \textbf{Contiguity-based (Baseados em contiguidade):} Grupos formados por vizinhanças imediatas, em que dois objetos conectam-se se a distância mútua for inferior a um limiar pré-estabelecido.
+    \item \textbf{Density-based (Baseados em densidade):} Regiões de alta densidade no espaço de atributos separadas por regiões contíguas de baixa densidade, viabilizando o isolamento de ruídos e o mapeamento de agrupamentos com geometrias arbitrárias e não convexas.
+\end{enumerate}
+
+\subsubsection{K-Means e Minimização do Erro Quadrático (SSE)}
+
+O algoritmo K-Means é o método particional baseado em centróides mais difundido na literatura. Dado um conjunto de $N$ objetos $X = \{x_1, \dots, x_N\}$ no espaço $\mathbb{R}^D$ e um número pré-definido $K$ de partições, o algoritmo busca determinar os conjuntos $C = \{C_1, \dots, C_K\}$ e seus respectivos centróides $m_k = \frac{1}{|C_k|} \sum_{x \in C_k} x$ que minimizem a Soma dos Erros Quadráticos (\textit{Sum of Squared Errors} - SSE) \cite{tan2019introduction}:
+\begin{equation}
+\mathrm{SSE} = \sum_{k=1}^K \sum_{x \in C_k} \|x - m_k\|^2.
+\label{eq:sse}
+\end{equation}
+Para atenuar a suscetibilidade da convergência a mínimos locais insatisfatórios decorrentes da escolha inicial aleatória, adota-se o esquema de inicialização probabilística inteligente K-Means++ \cite{arthur2007k}, no qual o primeiro centróide é sorteado uniformemente e os subsequentes são sorteados com probabilidade proporcional ao quadrado da distância mínima ao centróide mais próximo já selecionado ($D(x)^2$).
+
+\subsubsection{Agrupamento Baseado em Densidade: DBSCAN}
+
+O algoritmo DBSCAN (\textit{Density-Based Spatial Clustering of Applications with Noise}) \cite{ester1996density} define clusters a partir da densidade local de pontos. Dados dois hiperparâmetros fundamentais --- o raio de vizinhança $\varepsilon$ (\textit{Eps}) e o número mínimo de vizinhos $MinPts$ --- o algoritmo particiona as instâncias em três categorias conceituais \cite{tan2019introduction}:
+\begin{itemize}
+    \item \textbf{Ponto Núcleo (\textit{Core Point}):} Ponto cuja vizinhança esférica de raio $\varepsilon$ contém pelo menos $MinPts$ vizinhos, isto é, $|N_\varepsilon(x)| \ge MinPts$.
+    \item \textbf{Ponto de Borda (\textit{Border Point}):} Ponto que não satisfaz a condição de núcleo ($|N_\varepsilon(x)| < MinPts$), mas reside dentro da vizinhança-$\varepsilon$ de um ponto núcleo.
+    \item \textbf{Ponto de Ruído (\textit{Noise Point}):} Ponto que não é nem núcleo nem borda, sendo classificado como ruído ou \textit{outlier}.
+\end{itemize}
+Para evitar a escolha arbitrária de $\varepsilon$, segue-se a prescrição metodológica do gráfico de $k$-distâncias (\textit{k-distance graph}) proposta por \cite{ester1996density} e sintetizada por \cite{tan2019introduction}: calcula-se a distância de cada ponto ao seu $k$-ésimo vizinho mais próximo (com $k = MinPts$) e ordenam-se essas distâncias em ordem decrescente; o ponto de inflexão (*cotovelo/knee*) da curva indica o limiar ótimo de $\varepsilon$, separando a densidade dos agrupamentos genuínos da cauda esparsa de ruídos.
+
+\subsubsection{Métricas de Proximidade em Séries Temporais: Euclidiana vs. DTW}
+
+A aplicação de algoritmos de agrupamento diretamente sobre trajetórias temporais 1D exige cautela quanto à medida de proximidade. Enquanto a distância euclidiana impõe um alinhamento rígido ponto a ponto ($|x_t - y_t|$), tornando o modelo vulnerável a pequenos descompassos temporais e deslocamentos de fase, o algoritmo \textit{Dynamic Time Warping} (DTW) \cite{sakoe1978dynamic} encontra um caminho de alinhamento ótimo não linear na matriz de distâncias locais, permitindo associar padrões com acelerações ou desacelerações temporais relativas. No cálculo de centróides no espaço DTW, emprega-se o procedimento de \textit{DTW Barycenter Averaging} (DBA) para atualização iterativa das curvas médias.
+
+\subsubsection{Espaços Latentes 2D (GAF e MTF)}
+
+Na abordagem bidimensional, cada série temporal de comprimento $T$ gera matrizes $(T \times T)$ para GASF, GADF e MTF. Como a estrutura matricial impõe uma dimensão de $T^2$ atributos por canal (frequentemente correlacionados e simétricos em relação à diagonal principal), emprega-se Análise de Componentes Principais (PCA) sobre o espaço vetorizado das imagens para reter $95\%$ da variância total acumulada. Essa projeção ortogonal remove redundâncias colineares de alta frequência e preserva os eixos dominantes de dispersão estrutural das texturas visuais \cite{wu2023imaging}.
+
+\subsubsection{Critérios de Validação de Agrupamento}
+
+A qualidade e a coesão dos clusters gerados são avaliadas por meio de índices intrínsecos de validação não supervisionada \cite{tan2019introduction}:
+\begin{itemize}
+    \item \textbf{Coeficiente de Silhueta ($s$):} Proposto por \cite{rousseeuw1987silhouettes}, mensura o equilíbrio entre a coesão intra-cluster $a(i)$ (distância média do ponto $i$ aos demais membros de seu grupo) e a separação inter-cluster $b(i)$ (distância média do ponto $i$ aos pontos do grupo mais próximo):
+    \begin{equation}
+    s(i) = \frac{b(i) - a(i)}{\max(a(i),\, b(i))}, \quad s(i) \in [-1, +1].
+    \end{equation}
+    Valores próximos a $+1$ atestam excelente compactação e isolamento, enquanto valores próximos de zero ou negativos indicam indefinição de fronteira ou sobreposição.
+    \item \textbf{Índice Davies-Bouldin ($DB$):} Proposto por \cite{davies1979cluster}, calcula a razão média entre a dispersão interna dos pares de clusters e a distância entre seus centróides:
+    \begin{equation}
+    DB = \frac{1}{K} \sum_{i=1}^K \max_{j \ne i} \left( \frac{\bar{d}_i + \bar{d}_j}{d(m_i, m_j)} \right),
+    \end{equation}
+    em que valores menores denotam partições com clusters densos e bem espaçados.
+\end{itemize}
+
+\subsection{Metodologia Experimental}
+
+O protocolo experimental baseou-se na janela temporal de $T=32$ meses ($N = 3.872$ veículos lançados a partir de 2019 com histórico contínuo ou até $10\%$ de interpolação). Essa janela captura desde o preço de lançamento até a maturação de 2,6 anos de mercado, englobando choques econômicos pós-pandemia e a introdução da frota eletrificada.
+
+Foram avaliadas comparativamente as seguintes representações:
+\begin{enumerate}
+    \item \textbf{1D VRR (Euclidiano):} Vetores brutos da Taxa de Retenção de Valor em $\mathbb{R}^{32}$.
+    \item \textbf{1D VRR (DTW):} Séries 1D processadas via TimeSeriesKMeans com cálculo de centróides por DBA.
+    \item \textbf{2D GASF (PCA 95\%):} Projeção dos campos de soma angular em 2 componentes principais (responsáveis por $97{,}0\%$ da variância total).
+    \item \textbf{2D GADF (PCA 95\%):} Projeção dos campos de diferença angular em 5 componentes principais ($95{,}2\%$ da variância total).
+    \item \textbf{2D MTF (PCA 95\%):} Projeção dos campos de transição de Markov em 511 componentes ($95{,}0\%$ da variância total).
+    \item \textbf{2D Multicanal (PCA 95\%):} Projeção da concatenação plana dos três campos em 156 componentes principais ($95{,}0\%$ da variância).
+\end{enumerate}
+
+Para cada representação, o algoritmo K-Means foi testado na faixa $K \in \{2, 3, 4, 5, 6, 7\}$ com 10 inicializações independentes. Adicionalmente, calibrou-se o DBSCAN ($MinPts = 5$) determinando-se $\varepsilon$ a partir do joelho das curvas de $k$-distância.
+
+\subsection{Resultados e Validação de Agrupamento}
+
+A Tabela~\ref{tab:kmeans_metrics} reporta o desempenho comparativo das métricas de Silhueta e Davies-Bouldin ao longo dos diferentes valores de $K$.
+
+\begin{table}[htbp]
+\centering
+\caption{Métricas de validação intrínseca para diferentes números de clusters ($K$).}
+\label{tab:kmeans_metrics}
+\small
+\begin{tabularx}{\columnwidth}{@{} l c *{6}{X} @{}}
+\toprule
+\textbf{Representação} & \textbf{Métrica} & \textbf{K=2} & \textbf{K=3} & \textbf{K=4} & \textbf{K=5} & \textbf{K=6} & \textbf{K=7} \\
+\midrule
+1D VRR (Euclidiano) & Silhueta & 0,479 & 0,386 & 0,303 & 0,316 & 0,307 & 0,294 \\
+                    & Davies-Bouldin & 0,765 & 0,945 & 1,038 & 1,041 & 1,012 & 1,054 \\
+\addlinespace
+1D VRR (DTW)        & Silhueta & 0,459 & 0,345 & 0,258 & 0,194 & 0,164 & 0,169 \\
+                    & Davies-Bouldin & 0,792 & 1,096 & 1,383 & 1,583 & 1,676 & 1,476 \\
+\addlinespace
+\textbf{2D GASF}    & \textbf{Silhueta} & \textbf{0,544} & \textbf{0,481} & \textbf{0,430} & \textbf{0,384} & \textbf{0,387} & \textbf{0,378} \\
+                    & \textbf{Davies-Bouldin} & \textbf{0,661} & \textbf{0,747} & \textbf{0,811} & \textbf{0,854} & \textbf{0,831} & \textbf{0,840} \\
+\addlinespace
+2D GADF             & Silhueta & 0,457 & 0,451 & 0,413 & 0,396 & 0,319 & 0,318 \\
+                    & Davies-Bouldin & 0,941 & 1,089 & 0,970 & 0,996 & 0,995 & 1,036 \\
+\addlinespace
+2D MTF              & Silhueta & 0,066 & 0,075 & 0,071 & 0,074 & 0,047 & 0,048 \\
+                    & Davies-Bouldin & 3,175 & 3,680 & 3,033 & 3,011 & 3,163 & 3,277 \\
+\addlinespace
+2D Multicanal       & Silhueta & 0,397 & 0,293 & 0,225 & 0,210 & 0,186 & 0,167 \\
+                    & Davies-Bouldin & 0,997 & 1,240 & 1,475 & 1,442 & 1,485 & 1,558 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+A evolução quantitativa das métricas de coesão, separação e decaimento da inércia é ilustrada nas Figuras~\ref{fig:sil_comp}, \ref{fig:db_comp} e \ref{fig:elbow_comp}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\columnwidth]{../../output/clustering/silhouette_comparison.png}
+    \caption{Coeficiente de Silhueta médio para $K \in [2, 7]$ entre representações 1D e 2D.}
+    \label{fig:sil_comp}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\columnwidth]{../../output/clustering/davies_bouldin_comparison.png}
+    \caption{Índice Davies-Bouldin (menor é melhor) para $K \in [2, 7]$.}
+    \label{fig:db_comp}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\columnwidth]{../../output/clustering/elbow_normalized_comparison.png}
+    \caption{Curvas de decaimento do SSE normalizado em relação a $K=2$ (Método do Cotovelo).}
+    \label{fig:elbow_comp}
+\end{figure}
+
+\subsubsection{Análise Comparativa 1D vs. 2D}
+
+Os resultados experimentais revelam nuances teóricas de alto valor analítico:
+\begin{itemize}
+    \item \textbf{Superioridade da Codificação GASF:} O espaço latente derivado do GASF superou consistentemente todas as demais representações em todos os valores de $K$. Em $K=4$, o GASF obteve Silhueta de $+0{,}430$ contra $+0{,}303$ da abordagem 1D Euclidiana e $+0{,}258$ do 1D DTW. O índice Davies-Bouldin correspondente foi substancialmente inferior ($0{,}811$ no GASF frente a $1{,}038$ e $1{,}383$ nas abordagens 1D), comprovando que a transformação angular compacta variações redundantes e amplifica a discriminação de níveis e tendências absolutas de depreciação.
+    \item \textbf{Limitações do DTW em Dados Homogêneos:} A métrica DTW apresentou escores de silhueta inferiores aos da distância Euclidiana. Isso ocorre porque o DTW ``perdoa'' defasagens de tempo ao comprimir ou distender o eixo temporal para alinhar curvas. No mercado de veículos, porém, o instante exato em que um ativo se valoriza ou desvaloriza carrega significado econômico vital (p. ex., choque de semicondutores em 2021). Ao flexibilizar o alinhamento de fase temporal, o DTW aglutina veículos com perfis temporais intrinsecamente distintos, gerando grupos com dispersão euclidiana ampliada.
+    \item \textbf{Comportamento do MTF:} O campo de transição de Markov apresentou coeficiente de silhueta próximo de zero ($s \approx 0{,}07$) e alto Davies-Bouldin ($DB > 3{,}0$). Essa constatação é coerente com a formulação teórica de \cite{wang2015imaging} e os achados empíricos de \cite{wu2023imaging}: como os quantis do MTF são calculados em nível relativo individual de série, a matriz de transição preserva a dinâmica de oscilação local, mas perde completamente a magnitude absoluta do preço inicial e do VRR final.
+\end{itemize}
+
+\subsubsection{Calibração e Desempenho do DBSCAN}
+
+A Figura~\ref{fig:k_dist} exibe os gráficos de $k$-distância gerados para $MinPts = 5$. O joelho pronunciado estabeleceu os parâmetros $\varepsilon = 0{,}110$ para o espaço 1D VRR e $\varepsilon = 0{,}139$ para o espaço 2D GASF.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{../../output/clustering/k_distance_graph.png}
+    \caption{Curvas de $k$-distância ordenadas ($MinPts = 5$) e determinação do limiar $\varepsilon$.}
+    \label{fig:k_dist}
+\end{figure}
+
+O DBSCAN no espaço 1D identificou 30 agrupamentos e classificou $78{,}3\%$ da base como ruído (Silhueta de $-0{,}177$). Já no espaço 2D GASF, o algoritmo particionou instâncias em regiões de alta concentração central (Silhueta dos pontos nucleares de $+0{,}387$). O elevado percentual de ruído evidencia que as trajetórias de depreciação automotiva formam um contínuo com densidade variável e dispersão periférica, justificando a superioridade prática dos métodos particionais (K-Means) para a segmentação de mercado e definição de arquétipos.
+
+\subsection{Caracterização dos Arquétipos de Depreciação \texorpdfstring{($K=4$)}{(K=4)}}
+
+A inspeção da curva do cotovelo (Figura~\ref{fig:elbow_comp}) combinada à interpretabilidade econômica indica que $K=4$ representa o ponto de equilíbrio ótimo para derivar arquétipos comportamentais. A Tabela~\ref{tab:archetypes_summary} sintetiza os quatro perfis identificados pelo modelo 2D GASF, enquanto a Figura~\ref{fig:archetypes_traj} exibe as trajetórias de VRR com seus respectivos intervalos interquartis (Q1--Q3).
+
+\begin{table}[htbp]
+\centering
+\caption{Síntese dos quatro arquétipos comportamentais de depreciação identificados via 2D GASF ($K=4$).}
+\label{tab:archetypes_summary}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{} l r r r r r r r r @{}}
+\toprule
+\textbf{Arquétipo} & \textbf{Veículos} & \textbf{\% Total} & \textbf{VRR 0m} & \textbf{VRR 12m} & \textbf{VRR 32m} & \textbf{$\Delta$ Líquido} & \textbf{Elétricos} & \textbf{\% Eletrif.} \\
+\midrule
+\textbf{Cluster 1 (Depreciação Acelerada)} & 1.522 & 39,3\% & 98,4\% & 95,3\% & 84,8\% & $-13,6\%$ & 133 & 21,3\% \\
+\textbf{Cluster 2 (Super-Valorização)}      &   327 &  8,4\% & 99,9\% & 134,4\% & 140,0\% & $+40,1\%$ &   0 &  3,1\% \\
+\textbf{Cluster 3 (Valorização Moderada)}  &   864 & 22,3\% & 99,7\% & 117,7\% & 123,9\% & $+24,2\%$ &  10 &  7,1\% \\
+\textbf{Cluster 4 (Estabilidade Paritária)}& 1.159 & 29,9\% & 99,2\% & 106,6\% & 107,9\% &  $+8,7\%$ &  52 & 15,0\% \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{../../output/clustering/archetypes_trajectories_2d_gasf.png}
+    \caption{Trajetórias médias e dispersão interquartil (Q1--Q3) dos quatro arquétipos via 2D GASF.}
+    \label{fig:archetypes_traj}
+\end{figure*}
+
+Os quatro arquétipos apresentam características operacionais e econômicas nítidas:
+\begin{enumerate}
+    \item \textbf{Cluster 1 --- Depreciação Acelerada e Perda de Valor:} Reúne 1.522 veículos ($39{,}3\%$ da amostra). Apresenta perda contínua de cotação desde a estreia, fechando aos 32 meses com VRR médio de $84{,}8\%$ (queda acumulada de $-13{,}6\%$). Este agrupamento concentra a grande maioria dos veículos elétricos da base: \textbf{133 de um total de 195 elétricos ($68{,}2\%$ de toda a frota EV)} encontram-se alocados neste cluster, juntamente com 191 modelos híbridos.
+    \item \textbf{Cluster 2 --- Super-Valorização Anômala / Utilitários:} Composto por 327 veículos ($8{,}4\%$). Atinge VRR médio de $134{,}4\%$ aos 12 meses e finaliza aos 32 meses em expressivos $140{,}0\%$ de retenção (ganho líquido de $+40{,}1\%$). De forma contundente, \textbf{não há nenhum veículo elétrico neste cluster} ($0$ elétricos e apenas 10 híbridos). O agrupamento é dominado em mais de $97\%$ por veículos a combustão tradicional e veículos utilitários comerciais a diesel, refletindo a explosão de demanda e a escassez de suprimentos no período pandêmico.
+    \item \textbf{Cluster 3 --- Valorização Moderada / Resiliência Pós-Pandemia:} Agrupa 864 modelos ($22{,}3\%$) com valorização média de $+24{,}2\%$ (VRR final de $123{,}9\%$). Possui representação irrisória de modelos eletrificados ($10$ elétricos, representando apenas $1{,}2\%$ do grupo).
+    \item \textbf{Cluster 4 --- Estabilidade e Retenção Paritária:} Reúne 1.159 veículos ($29{,}9\%$) com trajetória resiliente e estável, encerrando aos 32 meses em $107{,}9\%$ do preço inicial ($+8{,}7\%$). Exibe composição mista equilibrada, integrando 52 veículos elétricos e 122 híbridos.
+\end{enumerate}
+
+A Figura~\ref{fig:comp_gasf} ilustra a estratificação dos quatro clusters segundo matriz energética e faixa de preço de lançamento. Constata-se que o Cluster 1 (Depreciação Acelerada) absorve a maior concentração percentual de veículos das categorias Intermediário e Luxo eletrificados, evidenciando que a depreciação mais severa incide preponderantemente sobre veículos novos equipados com tecnologia puramente elétrica.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{../../output/clustering/composition_2d_gasf.png}
+    \caption{Composição dos arquétipos segundo tipo de combustível e faixa de preço de lançamento.}
+    \label{fig:comp_gasf}
+\end{figure}
+
+Por fim, a Figura~\ref{fig:medoids_k4} exibe o medóide representativo de cada um dos quatro arquétipos, conectando a curva temporal de VRR às matrizes correspondentes de GASF, GADF e MTF. O medóide do Cluster 1 (perfil de desvalorização acelerada) exibe contraste angular invertido em relação aos medóides dos clusters em valorização contínua (Clusters 2 e 3), validando visualmente a capacidade das representações espaciais em sintetizar a física de mercado das trajetórias temporais.
+
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{../../output/clustering/medoids_gasf_k4.png}
+    \caption{Medóides representativos de cada arquétipo com suas respectivas séries e imagens 2D (GASF, GADF e MTF).}
+    \label{fig:medoids_k4}
+\end{figure*}

@@ -6,11 +6,11 @@ As técnicas de codificação de séries temporais em representações matriciai
 \subsection{Fundamentação}
 % com base nos artigos de GAF e MTF descrever como que eh possivel transformar as imagens
 
-A ideia central de \cite{wang2015imaging} é tratar uma série temporal como um sinal que pode ser reescrito em uma estrutura matricial, de modo que técnicas desenvolvidas para visão computacional (como redes neurais convolucionais) passem a ser aplicáveis a dados temporais. Os autores propõem três codificações: o \textit{Gramian Angular Summation Field} (GASF), o \textit{Gramian Angular Difference Field} (GADF) e o \textit{Markov Transition Field} (MTF). Esse tipo de abordagem também é adotado em trabalhos posteriores para agrupamento de séries, como em \cite{wu2023imaging}, que compara GASF, GADF, MTF e \textit{Recurrence Plots} (RP) e argumenta que a estrutura 2D reúne, em uma mesma representação, propriedades locais e relações de longo prazo da série.
+A ideia central de \cite{wang2015imaging} é tratar uma série temporal como um sinal que pode ser reescrito em uma estrutura matricial, de modo que técnicas desenvolvidas para visão computacional passem a ser aplicáveis a dados temporais. O autor propõem três codificações: o \textit{Gramian Angular Summation Field} (GASF), o \textit{Gramian Angular Difference Field} (GADF) e o \textit{Markov Transition Field} (MTF). Esse tipo de abordagem também é adotado em trabalhos posteriores para agrupamento de séries, como em \cite{wu2023imaging}, que compara GASF, GADF, MTF e \textit{Recurrence Plots} (RP) e argumenta que a estrutura 2D reúne, em uma mesma representação, propriedades locais e relações de longo prazo da série.
 
 \subsubsection{Gramian Angular Field (GASF e GADF)}
 
-Dada uma série $X = \{x_1, x_2, \dots, x_n\}$, o primeiro passo é reescalonar seus valores para o intervalo $[0,1]$ (ou $[-1,1]$) por meio de
+Dada uma série $X = \{x_1, x_2, \dots, x_n\}$, o primeiro passo é reescalonar seus valores para o intervalo $[0,1]$ (ou $[-1,1]$) por meio de uma normalização \textit{min-man}
 \begin{equation}
 \tilde{x}_i = \frac{x_i - \min(X)}{\max(X) - \min(X)}.
 \label{eq:rescale}
