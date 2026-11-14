@@ -611,7 +611,7 @@ def analyze_price_brackets(df: pl.DataFrame, output_dir: Path) -> None:
 
     # 1. Isolar os veículos únicos e converter centavos para Reais
     df_prices = (
-        df.filter(pl.col("ano_lancamento") >= 2019)
+        df.filter(pl.col("ano_modelo") >= 2019)
         .select(["codigo_fipe", "ano_modelo", "sigla_combustivel", "preco_lancamento"])
         .unique()
         .with_columns((pl.col("preco_lancamento") / 100).alias("preco_reais"))
@@ -709,7 +709,7 @@ def run_segmented_price_analysis(df: pl.DataFrame, output_dir: Path) -> None:
     print("\n--- Segmenting Cohort (>= 2019) by Global Launch Price ---")
 
     # 1. Filtra a coorte de interesse
-    df_recent = df.filter(pl.col("ano_lancamento") >= 2019)
+    df_recent = df.filter(pl.col("ano_modelo") >= 2019)
 
     # 2. Encontra o Q1 e Q3 GLOBAIS isolando cada veículo único, convertendo para Reais
     df_prices = (
@@ -837,7 +837,7 @@ def analyze_series_length_coverage(
     df: pl.DataFrame,
     output_dir: Path,
     thresholds: tuple = (24, 32, 48, 64),
-    min_launch_year: int = 2019,
+    min_model_year: int = 2019,
 ) -> pl.DataFrame:
     """
     Analyzes how long the price history of each unique vehicle is, to help choose
@@ -846,19 +846,19 @@ def analyze_series_length_coverage(
     A unique vehicle is defined by (codigo_fipe, ano_modelo, sigla_combustivel).
     For each one, the function computes the maximum age in months ('max_idade_meses'),
     the number of available records ('n_registros') and the completeness of the series
-    (records / months spanned), restricted to vehicles launched from 'min_launch_year'.
+    (records / months spanned), restricted to vehicles with model year from 'min_model_year'.
     It then prints and plots (1) how many vehicles fall in each length bin delimited
     by 'thresholds' and (2) how many vehicles would be kept for each minimum length,
     both per fuel type.
     """
-    print(f"\n--- Series Length Coverage (launch year >= {min_launch_year}) ---")
+    print(f"\n--- Series Length Coverage (model year >= {min_model_year}) ---")
 
     cohort_keys = ["codigo_fipe", "ano_modelo", "sigla_combustivel"]
     thresholds = tuple(sorted(thresholds))
 
     # 1. Um registro por veículo único com o maior histórico disponível
     vehicles = (
-        df.filter(pl.col("ano_lancamento") >= min_launch_year)
+        df.filter(pl.col("ano_modelo") >= min_model_year)
         .group_by(cohort_keys)
         .agg(
             [

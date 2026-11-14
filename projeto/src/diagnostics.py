@@ -26,7 +26,7 @@ DERIVED_COLS = [
 
 
 def diagnose_t0_duplicates(
-    df: pl.DataFrame, min_launch_year: int = 2019, n_examples: int = 3
+    df: pl.DataFrame, min_model_year: int = 2019, n_examples: int = 3
 ) -> pl.DataFrame:
     """
     Finds vehicles with more than one record in the same month (focusing on month 0)
@@ -41,10 +41,10 @@ def diagnose_t0_duplicates(
 
     Returns the duplicated records at month 0 (all columns), sorted by vehicle.
     """
-    print(f"\n--- Duplicated records in the same month (launch year >= {min_launch_year}) ---")
+    print(f"\n--- Duplicated records in the same month (model year >= {min_model_year}) ---")
 
     month_keys = COHORT_KEYS + ["data_referencia"]
-    recent = df.filter(pl.col("ano_lancamento") >= min_launch_year)
+    recent = df.filter(pl.col("ano_modelo") >= min_model_year)
 
     groups = recent.group_by(month_keys).agg(
         [
@@ -163,7 +163,7 @@ def diagnose_t0_duplicates(
 
 def diagnose_zero_km_streams(
     df: pl.DataFrame,
-    min_launch_year: int = 2019,
+    min_model_year: int = 2019,
     max_age: int = 24,
     ages_to_show: tuple = (0, 1, 2, 3, 6, 9, 12, 18, 23),
 ) -> pl.DataFrame:
@@ -179,9 +179,9 @@ def diagnose_zero_km_streams(
 
     Needs the 'zero_km' column (kept by preprocess_data). Returns the vehicle-month table.
     """
-    print(f"\n--- zero_km vs. regular price streams (launch year >= {min_launch_year}) ---")
+    print(f"\n--- zero_km vs. regular price streams (model year >= {min_model_year}) ---")
 
-    recent_all = df.filter(pl.col("ano_lancamento") >= min_launch_year)
+    recent_all = df.filter(pl.col("ano_modelo") >= min_model_year)
     recent = recent_all.filter(pl.col("idade_meses") < max_age)
 
     cm = (

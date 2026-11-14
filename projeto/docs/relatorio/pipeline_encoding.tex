@@ -48,7 +48,7 @@
         \node (series_box) [box_delimitador, minimum width=13cm, minimum height=3.0cm, below=0.8cm of pre_box] {};
         \node (series_title) [title_block] at (series_box.north) {3. Construção das Séries};
 
-        \node (window) [sub_block, text width=3.5cm] at ([xshift=-4.4cm, yshift=-0.35cm]series_box.center) {Janelas\\$T \in \{24, 32, 48, 64\}$ meses\\(lançamento $\geq$ 2019)};
+        \node (window) [sub_block, text width=3.5cm] at ([xshift=-4.4cm, yshift=-0.35cm]series_box.center) {Janelas\\$T \in \{24, 32, 48, 64\}$ meses\\(ano-modelo $\geq$ 2019)};
         \node (interp) [sub_block, text width=3.5cm] at ([xshift=0cm, yshift=-0.35cm]series_box.center) {Interpolação linear\\(descarta séries com\\$>$ 10\% de meses faltantes)};
         \node (scale) [sub_block, text width=3.5cm] at ([xshift=4.4cm, yshift=-0.35cm]series_box.center) {Escala global\\$\mathrm{VRR}/1{,}5$ em $[0,1]$\\(com \textit{clipping})};
 

@@ -18,7 +18,7 @@
 
 \begin{document}
 
-\title{Caracterização de Padrões de Depreciação Automotiva sob a Transição Energética: Uma Abordagem Baseada em Transformação Bidimensional de Séries Temporais}
+\title{Caracterização de Padrões de Depreciação Automotiva sob a Transição Energética}
 
 \author{\IEEEauthorblockN{Gabriel Martins Brum}
 \IEEEauthorblockA{\textit{Departamento de Ciência da Computação e Estatística} \\
@@ -29,104 +29,89 @@ g.brum@unesp.br}
 
 \maketitle
 
-% o abstract deve ter uma estrutura assim. contexto -> problema -> o que o trabalho fez pra resolver o problema -> resultados encontrados
 \begin{abstract}
-A transição para a mobilidade elétrica introduz incertezas na precificação de veículos seminovos em razão da perda de capacidade de baterias, rápida obsolescência técnica e guerras comerciais de preços. Este artigo investiga a desvalorização veicular a partir de microdados da base fipeX. A investigação analisa se veículos elétricos apresentam desvalorização acelerada em relação a modelos convencionais de mesma faixa de preço de lançamento, bem como se a codificação de séries temporais em matrizes bidimensionais via \textit{Gramian Angular Fields} e \textit{Markov Transition Fields} aprimora o agrupamento não supervisionado frente a abordagens clássicas. A metodologia emprega a Taxa de Retenção de Valor em uma janela temporal de 32 meses com 4.457 séries, redução de dimensionalidade por PCA e modelagem por K-Means e DBSCAN. A validação das partições foi realizada por métricas intrínsecas e análise de variância bidirecional.
+A transição para a mobilidade elétrica introduz incertezas na precificação de seminovos decorrentes da perda de capacidade de baterias, rápida evolução técnica e guerras comerciais de preços. Este artigo investiga a desvalorização veicular no Brasil a partir de microdados da base fipeX, analisando a preponderância da matriz energética frente ao estrato econômico e a eficácia da codificação de séries temporais em matrizes bidimensionais via Gramian Angular Fields. A metodologia emprega a Taxa de Retenção de Valor ao longo de 32 meses com 4.457 trajetórias, redução dimensional por PCA e agrupamento via K-Means e DBSCAN. A representação GASF proporcionou ganho de silhueta e aceleração computacional frente ao alinhamento elástico DTW. A análise estatística confirmou que a desvalorização acelerada decorre prioritariamente da propulsão elétrica, registrando defasagem de 25 pontos percentuais frente a modelos convencionais de mesmo estrato.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Mineração de Séries Temporais, Veículos Elétricos, \textit{Reshaping}, Agrupamento, Depreciação Automotiva.
+Mineração de Séries Temporais, Veículos Elétricos, Reshaping, Agrupamento, Depreciação Automotiva.
 \end{IEEEkeywords}
 
 \section{Introdução}
 
-% contextualização deve ter dois eixos, um do mercado automotivo e outro do reshaping de séries temporais para imagem para aumento de desempenho de modelos classificadores. o contexto do mercado automotivo deve apresentar as pesquisas que falem sobre os estudos que investigam a depreciação de veiculos elétriso/híbridos e comparam com veículos a combustão (porem nenhum eh realizado no brasil). ja o contexto do reshaping de series temporais devem apresentar estudos e casos que a transformacao para o dominio das imagens trouxe beneficios, e isso eh uma tecnica recente na literatura.
+O mercado automotivo atravessa um processo de reorganização tecnológica impulsionado pela expansão de veículos elétricos e híbridos no Brasil e no cenário internacional \cite{alvarez2024modelagem}. A especulação em torno da desvalorização desses ativos constitui um entrave à aquisição no mercado de seminovos, elevando a incerteza quanto ao custo total de posse \cite{rush2022vehicle}. Automóveis equipados com motores a combustão interna apresentam trajetórias de depreciação consolidadas e amortecidas em função da idade do bem \cite{storchmann2004depreciation}. Em contrapartida, veículos eletrificados enfrentam fatores depreciativos particulares, tais como a perda de capacidade de armazenamento das baterias de íons de lítio e a rápida substituição por modelos de maior autonomia \cite{gautam2024depreciation}. A avaliação empírica sobre mercados internacionais apurou depreciação média anual de 13,9\% para elétricos, superando a taxa de 10,4\% de modelos convencionais a gasolina \cite{schloter2022empirical}. A literatura concentra-se prioritariamente em economias desenvolvidas, subsistindo uma lacuna empírica sobre a dinâmica do mercado brasileiro sob a transição energética recente \cite{li2026global, silva2024avaliacao}.
 
-% motivação e justificativa: dado que o mercado brasileiro dos veículos elétricos e híbridos é recente, e carece de estudos que investiguem a depreciação dos mesmos, a literatura apresenta uma lacuna. o reshaping serve tambem para uma melhor caracterizacao dos padroes de depreciacao. alem de que o reshaping de series temporais de veiculos tambem seja uma lacuna (checar se é mesmo).
+No campo analítico, abordagens tradicionais representam séries temporais como vetores unidimensionais com distâncias Euclidianas sensíveis a ruídos locais, enquanto o algoritmo Dynamic Time Warping (DTW) introduz elevado custo computacional e distorções que atenuam choques macroeconômicos síncronos \cite{sakoe1978dynamic}. A conversão de séries temporais em matrizes bidimensionais via Gramian Angular Summation Field (GASF), Gramian Angular Difference Field (GADF) e Markov Transition Field (MTF) agrega atributos intrínsecos e aprimora partições não supervisionadas \cite{wang2015imaging, wu2023imaging}. Este trabalho investiga duas questões centrais de pesquisa: (i) se a inserção de veículos elétricos induz desvalorização relativa mais acelerada em comparação a veículos convencionais de mesmo estrato econômico inicial, ou se o padrão observado decorre da faixa de preço do bem, e (ii) se a codificação de séries temporais em matrizes bidimensionais projetadas via PCA produz agrupamentos com maior coesão e separabilidade intrínseca frente a métricas vetoriais clássicas. Como contribuições, o estudo caracteriza a retenção veicular ao longo de 32 meses na base fipeX, comprova estatisticamente a primazia da matriz energética por pareamento e análise de variância, e valida a eficiência da codificação GASF frente ao alinhamento elástico.
 
-% objetivos: alem de apenas caracterizar a depreciacao, o trabalho busca investigar se o mapeamento para o dominoi das imagens melhora a separabilidade dos grupos, e se o agrupamento une veiculos mais por faixa de preço ou por matriz energetica. tambem analisarei se a depreciacao dos carros a combustao foram afetados pelos eletricos ou nao.
-
-% contribuicoes: (1) caracterizacao da depreciacao de veiculos eletricos e hibridos no brasil, (2) investigacao do efeito da matriz energetica sobre a depreciacao frente a faixa de preco, (3) investigacao do efeito do reshaping sobre a separabilidade dos grupos. (4) investigacao do efeito da entrada de veiculos eletricos sobre a depreciacao dos veiculos a combustao.
-
-O mercado automotivo global e brasileiro atravessa um processo de reorganização tecnológica impulsionado pela introdução e expansão de veículos elétricos (EVs) e híbridos \cite{alvarez2024modelagem}. A especulação em torno da depreciação desses veículos cria uma barreira para potenciais compradores, gerando receio quanto à revenda e elevando a incerteza sobre a taxa de desvalorização dos ativos \cite{rush2022vehicle}. Automóveis equipados com motores a combustão apresentam trajetória de desvalorização consolidada e linearizada em função da idade do bem \cite{storchmann2004depreciation}. Em contrapartida, os veículos eletrificados enfrentam incertezas operacionais singulares, destacando-se a perda de capacidade de armazenamento das baterias de íons de lítio e a rápida substituição técnica por modelos de maior autonomia \cite{gautam2024depreciation}. A avaliação empírica conduzida sobre cinco mercados desenvolvidos apurou depreciação média anual de 13,9\% para veículos elétricos (1,16\% ao mês), superando a taxa de 10,4\% ao ano observada em modelos convencionais a gasolina \cite{schloter2022empirical}. A literatura sobre o comportamento de depreciação veicular e políticas tarifárias tem se concentrado prioritariamente em economias desenvolvidas e na China, subsistindo uma lacuna empírica quanto à dinâmica do mercado brasileiro sob a transição energética \cite{li2026global, silva2024avaliacao}.
-
-Para além da dinâmica setorial de mercado, a análise e a descoberta de padrões comportamentais em séries temporais têm incorporado técnicas de codificação matricial bidimensional (\textit{reshaping}) \cite{tan2019introduction, wang2015imaging}. Abordagens convencionais representam o histórico de preços como vetores unidimensionais em $\mathbb{R}^T$, empregando distâncias Euclidianas sensíveis a desvios de escala e ruídos pontuais. O algoritmo Dynamic Time Warping (DTW) flexibiliza o alinhamento de sequências desfasadas, mas distensões no eixo temporal tendem a suprimir a sincronia de choques macroeconômicos exógenos, além de introduzir elevado custo computacional quadrático sobre bases volumosas \cite{sakoe1978dynamic}. Em contraposição, a conversão de séries temporais em matrizes bidimensionais atua como um agregador de atributos intrínsecos sobre a sequência original sem demandar variáveis externas. As transformações Gramian Angular Summation Field (GASF), Gramian Angular Difference Field (GADF) e Markov Transition Field (MTF) proporcionam reduções de 12\% a 48\% no erro de classificação frente a vetores brutos ao preservar relações angulares e matrizes de transição, promovendo adicionalmente maior estabilidade e ganho de silhueta no agrupamento financeiro \cite{wang2015imaging, wu2023imaging}. Esse panorama delimita duas lacunas centrais investigadas neste artigo: a carência de estudos empíricos sobre a Taxa de Retenção de Valor (VRR) de veículos elétricos e híbridos em comparação a modelos a combustão no mercado brasileiro e a inexistência de investigações que empreguem técnicas de \textit{reshaping} para a descoberta de padrões de desvalorização veicular.
-
-\subsection{Objetivos, Questões de Pesquisa e Contribuições}
-
-O objetivo deste estudo consiste em analisar a dinâmica temporal de desvalorização veicular sob a transição energética no Brasil por meio de agrupamento não supervisionado, contrastando espaços vetoriais unidimensionais com representações matriciais bidimensionais combinadas à redução dimensional. A investigação é guiada por duas questões centrais de pesquisa:
-(1) a entrada de veículos elétricos induz desvalorização relativa mais acelerada em comparação a veículos convencionais pareados no mesmo estrato econômico de lançamento, ou o padrão observado reflete prioritariamente a faixa de preço do ativo?
-(2) a codificação de séries temporais em matrizes bidimensionais projetadas via PCA produz agrupamentos com maior coesão e separabilidade intrínseca em relação às métricas vetoriais clássicas Euclidianas e DTW?
-
-A partir dessa formulação, o trabalho apresenta três contribuições principais:
-(1) a caracterização quantitativa da retenção de valor de automóveis elétricos, híbridos e a combustão no mercado brasileiro ao longo de 32 meses de acompanhamento com microdados da base fipeX;
-(2) a comprovação estatística do papel preponderante da matriz energética sobre a depreciação por meio de pareamento econômico intra-estrato e análise de variância bidirecional;
-(3) a validação da codificação matricial GASF associada ao PCA como alternativa computacionalmente eficiente e com qualidade de separabilidade superior ao alinhamento elástico clássico.
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth,height=3.5cm,keepaspectratio]{img/archetypes_trajectories_2d_gasf.png}
+    \caption{Trajetórias temporais médias e dispersão interquartil (Q1--Q3) dos quatro arquétipos comportamentais descobertos no espaço latente GASF com $K=4$.}
+    \label{fig:archetypes_traj}
+\end{figure*}
 
 \section{Materiais e Métodos}
 
-O procedimento metodológico foi dividido em quatro etapas executadas sequencialmente: preparação da base de dados, pré-processamento das séries temporais de retenção de valor, codificação matricial bidimensional com redução dimensional e modelagem de agrupamento com validação das partições.
+O procedimento metodológico compreendeu a preparação dos dados, o cômputo da retenção de valor, a codificação matricial bidimensional e o agrupamento com validação estatística.
 
-\subsection{Base de Dados FipeX}
+\subsection{Base de Dados FipeX e Pré-Processamento}
 
-Os dados foram obtidos do repositório público fipeX, que reúne o histórico de preços médios mensais de veículos automotores comercializados no Brasil apurados pela Fundação Instituto de Pesquisas Econômicas (FIPE) entre maio de 2005 e janeiro de 2026 \cite{fipex2024}. A base original continha 9.276.121 registros cadastrais com atributos de identificação do modelo, montadora, ano de modelo, tipo de veículo, matriz energética e preço médio de mercado cotado em Reais ($P_{i,t}$).
+Os dados foram obtidos do repositório público fipeX, reunindo o histórico de preços médios mensais apurados pela Fundação Instituto de Pesquisas Econômicas (FIPE) entre 2001 e 2026 \cite{fipex2024}. A base original de 9.276.121 registros foi filtrada para isolar automóveis de passeio lançados a partir de 2019 com acompanhamento contínuo por uma janela de $T = 32$ meses (2,6 anos). Foram removidas duplicatas, utilitários pesados, modelos com defasagem cadastral superior a um ano e combustíveis com participação residual, correspondendo à exclusão de 60,2\% dos registros. A evolução dos preços foi quantificada pela Taxa de Retenção de Valor (VRR), calculada pela razão $VRR_{i,t} = P_{i,t} / P_{i,0}$ entre a cotação no mês $t$ e o preço de lançamento no mês zero, eliminando a magnitude nominal da moeda. A amostra resultante contém 4.457 trajetórias temporais completas, englobando 1.756 veículos Flex (39,4\%), 1.258 a Gasolina (28,2\%), 871 a Diesel (19,5\%), 382 Híbridos (8,6\%) e 190 Elétricos (4,3\%). Os estratos econômicos foram delimitados pelos quartis de lançamento: Entrada ($P_0 \le \text{R\$ } 82.998$), Intermediário ($\text{R\$ } 82.998 < P_0 \le \text{R\$ } 325.283$) e Luxo ($P_0 > \text{R\$ } 325.283$).
 
-\subsection{Pré-Processamento e Análise Exploratória}
+\subsection{Codificação Bidimensional e Redução Dimensional}
 
-O procedimento de limpeza e preparação foi conduzido para eliminar inconsistências e isolar a evolução dos preços em relação à idade cronológica dos veículos. Foram descartadas 83 instâncias duplicadas e 22 registros com valor monetário nulo. A base foi restrita a automóveis de passeio, o que resultou na exclusão de 3.565.306 registros referentes a motocicletas, caminhões e utilitários de grande porte. Modelos antigos cadastrados com atraso na FIPE foram eliminados por meio da restrição temporal $(ano\_lancamento - ano\_modelo) \le 1$, descartando 1.942.304 registros para assegurar que a idade zero corresponda ao período de estreia comercial do ativo. Foram removidos 52.721 registros de combustíveis com volume residual (etanol e gás natural) e 24.996 registros de montadoras com baixa participação de mercado. Esse processo totalizou a exclusão de 5.585.432 registros, correspondendo a uma redução de 60,2\% da base inicial.
-
-A base remanescente de 3.690.689 registros pertencentes a 63 montadoras foi submetida ao cálculo da Taxa de Retenção de Valor (VRR), definida pela relação entre o preço no mês de avaliação $t$ e o preço de lançamento no mês inicial:
-\begin{equation}
-VRR_{i,t} = \frac{P_{i,t}}{P_{i,0}}, \quad t \in \{0, 1, \dots, T-1\}.
-\label{eq:vrr}
-\end{equation}
-O cálculo da Equação~\ref{eq:vrr} remove a magnitude nominal dos preços em Reais e permite a comparação direta entre veículos de diferentes faixas de mercado. Para viabilizar a modelagem, a amostra foi restrita a veículos lançados a partir de 2019 com acompanhamento contínuo por uma janela de $T = 32$ meses (2,6 anos), tolerando até 10\% de interpolação linear para meses ausentes. Esse corte consolidou uma matriz balanceada de 4.457 séries temporais completas. A amostra resultante é composta por 1.756 veículos Flex (39,4\%), 1.258 a Gasolina (28,2\%), 871 a Diesel (19,5\%), 382 Híbridos (8,6\%) e 190 Elétricos (4,3\%).
-
-A categorização econômica foi estabelecida a partir dos quartis gerais dos preços de lançamento, apurando $Q_1$ igual a R\$ 82.998,00, mediana de R\$ 155.043,00 e $Q_3$ de R\$ 325.283,00. Os veículos foram classificados nos estratos de Entrada ($P_{i,0} \le Q_1$), Intermediário ($Q_1 < P_{i,0} \le Q_3$) e Luxo ($P_{i,0} > Q_3$).
-
-\subsection{Codificação Bidimensional de Séries Temporais}
-
-As trajetórias temporais de retenção de valor foram convertidas em matrizes quadradas de dimensão $32 \times 32$ sem redimensionamento prévio, conforme o método proposto por Wang e Oates \cite{wang2015imaging}. A série normalizada no intervalo $[-1, 1]$ foi inicialmente projetada em coordenadas polares com ângulo $\phi_t = \arccos(\widetilde{VRR}_t)$ e raio $r_t = t/T$. A matriz Gramian Angular Summation Field (GASF) foi gerada a partir da soma cosseno entre os pontos temporais:
-\begin{equation}
-G_{(i,j)} = \cos(\phi_i + \phi_j) = \widetilde{x}_i \widetilde{x}_j - \sqrt{1 - \widetilde{x}_i^2}\sqrt{1 - \widetilde{x}_j^2}.
-\label{eq:gasf}
-\end{equation}
-A transformação descrita na Equação~\ref{eq:gasf} preserva a correlação temporal e os valores médios de retenção do ativo. A matriz Gramian Angular Difference Field (GADF) foi calculada por meio da diferença seno:
-\begin{equation}
-D_{(i,j)} = \sin(\phi_i - \phi_j) = \widetilde{x}_j \sqrt{1 - \widetilde{x}_i^2} - \widetilde{x}_i \sqrt{1 - \widetilde{x}_j^2},
-\label{eq:gadf}
-\end{equation}
-agregando informação relativa às taxas locais de variação e à velocidade de perda de valor ao longo da série. A técnica Markov Transition Field (MTF) foi construída discretizando as trajetórias em cinco quantis de amplitude e computando as probabilidades de transição estocástica de primeira ordem entre os passos temporais $i$ e $j$. Como o vetor achatado de cada imagem contém 1.024 atributos por canal e 3.072 atributos na fusão dos três canais, a técnica de Análise de Componentes Principais (PCA) foi aplicada retendo 95\% da variância explicada acumulada \cite{tan2019introduction}. Essa projeção reduziu os dados para 2 componentes no GASF e 5 componentes no GADF, eliminando ruídos colineares.
+As trajetórias de retenção de valor foram convertidas em matrizes de dimensão $32 \times 32$ pelo método de Wang e Oates \cite{wang2015imaging}. Cada série normalizada no intervalo $[-1, 1]$ foi projetada em coordenadas polares com ângulo $\phi_t = \arccos(\widetilde{VRR}_t)$ e raio $r_t = t/T$. A matriz Gramian Angular Summation Field (GASF) foi gerada pela soma cosseno $G_{(i,j)} = \cos(\phi_i + \phi_j)$, preservando correlações temporais e valores médios da série. A matriz Gramian Angular Difference Field (GADF) foi calculada pela diferença seno $D_{(i,j)} = \sin(\phi_i - \phi_j)$, capturando taxas instantâneas de variação. A matriz Markov Transition Field (MTF) foi obtida pela discretização em cinco quantis de amplitude, computando probabilidades de transição estocástica de primeira ordem entre os passos temporais. Para atenuar a dimensionalidade de 1.024 atributos por canal, a técnica de Análise de Componentes Principais (PCA) foi aplicada retendo 95\% da variância acumulada, resultando em 2 componentes para o GASF e 5 para o GADF \cite{tan2019introduction}.
 
 \subsection{Modelagem de Agrupamento e Protocolo de Validação}
 
-O algoritmo K-Means foi avaliado com inicialização K-Means++ variando $K$ de 2 a 7 sobre o espaço 1D VRR Euclidiano, sobre o espaço 1D com alinhamento temporal e sobre os espaços latentes gerados pelas imagens 2D via PCA \cite{arthur2007k, sakoe1978dynamic}. O algoritmo baseado em densidade DBSCAN também foi investigado, adotando o raio $\varepsilon$ determinado pelo ponto de inflexão das curvas de $k$-distâncias para $MinPts = 5$ \cite{ester1996density, tan2019introduction}.
-
-A avaliação das partições foi conduzida por critérios intrínsecos e testes extrínsecos. Na validação intrínseca, foram calculados o coeficiente de Silhueta médio e o índice Davies-Bouldin, acompanhados da análise do decaimento da soma dos erros quadráticos \cite{rousseeuw1987silhouettes, davies1979cluster}. Na validação extrínseca com os rótulos de combustível e faixa de preço, foram computados o índice Rand ajustado (ARI), a informação mútua normalizada (NMI), a homogeneidade, a completude e o coeficiente $V$ de Cramér. A contribuição de cada fator sobre a variação líquida aos 32 meses ($\Delta VRR = VRR_{32m} - VRR_{0m}$) foi quantificada por análise de variância (ANOVA) bidirecional ($2 \times 5$).
+O algoritmo K-Means foi executado com inicialização K-Means++ variando $K \in [2, 7]$ sobre o espaço 1D Euclidiano, sobre o alinhamento temporal DTW com média Barcellona (DBA) e sobre os espaços latentes gerados pelas imagens 2D via PCA \cite{arthur2007k, sakoe1978dynamic}. O algoritmo DBSCAN também foi avaliado com $\varepsilon$ definido pelo ponto de inflexão das curvas de $k$-distâncias para $MinPts = 5$ \cite{ester1996density}. A validação intrínseca das partições foi realizada pelo coeficiente de Silhueta médio e pelo índice Davies-Bouldin \cite{rousseeuw1987silhouettes, davies1979cluster}. A validação extrínseca avaliou a aderência às categorias cadastrais de combustível e estrato de preço por ARI, NMI e coeficiente $V$ de Cramér. O efeito isolado da tecnologia de propulsão e da faixa de preço sobre a variação líquida aos 32 meses ($\Delta VRR = VRR_{32m} - VRR_{0m}$) foi quantificado por análise de variância (ANOVA) bidirecional ($2 \times 5$).
 
 \section{Resultados e Discussão}
 
 \subsection{Análise Exploratória e Pareamento de Segmentos}
 
-A amostra de 4.457 trajetórias de retenção expõe o comportamento singular do mercado brasileiro entre 2019 e 2026. Em contraste com o padrão histórico de depreciação linear, automóveis a combustão registraram valorização nominal atípica motivada por choques na cadeia global de suprimentos, atingindo retenção média superior a 115\% em modelos Flex e Diesel aos 12 e 24 meses. Em contrapartida, veículos elétricos exibiram desvalorização contínua. Como 93,2\% dos elétricos pertencem aos estratos Intermediário e de Luxo (mediana de R\$ 322.000,00) e 75,5\% dos modelos Flex integram o estrato de Entrada (mediana de R\$ 77.000,00), a avaliação comparativa demanda pareamento intra-estrato para isolar a tecnologia de propulsão da magnitude nominal do preço inicial.
+A análise das 4.457 trajetórias evidenciou comportamento atípico no mercado nacional entre 2019 e 2026. Em contraposição ao padrão histórico de desvalorização contínua, automóveis a combustão registraram valorização nominal motivada por restrições na cadeia global de suprimentos, atingindo retenção média superior a 115\% em modelos Flex e Diesel aos 24 meses. Em sentido oposto, veículos elétricos exibiram desvalorização monotônica. Como 93,2\% dos elétricos pertencem aos estratos Intermediário e de Luxo (mediana de R\$ 322.000,00) e 75,5\% dos modelos Flex integram o estrato de Entrada (mediana de R\$ 77.000,00), o pareamento intra-estrato foi estabelecido para isolar o combustível da magnitude do investimento inicial.
 
-\subsection{Eficácia Comparativa das Representações 1D e 2D}
+\subsection{Eficácia Comparativa das Representações}
 
-A qualidade do agrupamento pelo algoritmo K-Means foi avaliada para partições de $K=2$ a $K=7$ sobre os espaços vetoriais 1D e os espaços latentes das transformações bidimensionais reduzidas por PCA. Para a partição com quatro grupos ($K=4$), a projeção matricial GASF alcançou a maior coesão e separabilidade intrínseca ($s = 0,410$, $DB = 0,784$, tempo de 0,05 s), superando expressivamente o vetor 1D Euclidiano ($s = 0,311$, $DB = 1,028$, 0,06 s) e o alinhamento DTW com DBA ($s = 0,243$, $DB = 1,212$, 71,62 s). A transformação GADF produziu separabilidade semelhante ($s = 0,424$, $DB = 0,967$, 0,05 s), enquanto a codificação MTF obteve desempenho insatisfatório ($s = 0,064$, $DB = 3,116$, 0,80 s) pela supressão do gradiente contínuo na discretização em quantis. A fusão multicanal registrou $s = 0,200$, $DB = 1,502$ e 0,24 s, denotando dispersão de atributos. O processamento sobre os dois componentes do GASF consumiu apenas 0,05 segundos, estabelecendo uma aceleração superior a 1.400 vezes frente ao cálculo elástico do DTW.
+O particionamento pelo algoritmo K-Means evidenciou a superioridade da representação matricial 2D, conforme os coeficientes de Silhueta apresentados na Figura~\ref{fig:silhouette_comp}. Para a partição com quatro grupos ($K=4$), a projeção GASF alcançou a maior coesão e separabilidade intrínseca ($s = 0,410$, $DB = 0,784$, tempo de 0,05 s), superando o vetor 1D Euclidiano ($s = 0,311$, $DB = 1,028$, 0,06 s) e o alinhamento elástico DTW ($s = 0,243$, $DB = 1,212$, 71,62 s). A codificação GADF alcançou separabilidade comparável ($s = 0,424$, $DB = 0,967$, 0,05 s), enquanto a técnica MTF apresentou dispersão ($s = 0,064$, $DB = 3,116$, 0,80 s) pela perda do gradiente contínuo na quantização. O processamento sobre os componentes principais do GASF atingiu velocidade 1.400 vezes superior à distância DTW.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{img/silhouette_comparison.png}
+    \caption{Coeficiente de Silhueta médio para $K \in [2, 7]$ entre as representações vetoriais 1D e os espaços latentes 2D reduzidos via PCA.}
+    \label{fig:silhouette_comp}
+\end{figure}
 
 \subsection{Arquétipos de Depreciação e Validação Extrínseca}
 
-O particionamento no espaço GASF com $K=4$ identificou quatro arquétipos temporais de retenção: Valorização Moderada ($C_1$, média de $+23,3\%$ aos 32 meses, 1.005 veículos), Depreciação Acelerada ($C_2$, média de $-13,6\%$, 1.624 veículos), Super-Valorização ($C_3$, média de $+39,6\%$, 338 veículos) e Estabilidade ($C_4$, média de $+5,7\%$, 1.490 veículos). O arquétipo $C_2$ reuniu 65,8\% de todos os veículos elétricos da base (125 unidades) e 48,4\% dos modelos híbridos, ao passo que $C_3$ não conteve nenhum modelo elétrico.
+O agrupamento no espaço latente GASF com $K=4$ identificou quatro arquétipos comportamentais de retenção de valor, cujas características estão sintetizadas na Tabela~\ref{tab:arquetipos} e cujas trajetórias temporais são exibidas na Figura~\ref{fig:archetypes_traj}. O arquétipo de Depreciação Acelerada ($C_2$) concentrou 65,8\% de todos os veículos elétricos da base (125 unidades) e 48,4\% dos modelos híbridos, enquanto o grupo de Super-Valorização ($C_3$) não continha nenhum modelo elétrico. Os testes extrínsecos registraram escores reduzidos ($ARI = 0,012$, $NMI = 0,022$ e $V = 0,140$ para combustível, bem como $ARI = 0,012$, $NMI = 0,024$ e $V = 0,159$ para faixa de preço), confirmando que a modelagem não replica divisões prévias, mas organiza os dados pela dinâmica temporal real das curvas.
 
-Os testes de validação extrínseca registraram $ARI = 0,012$, $NMI = 0,022$ e $V = 0,140$ para combustível, e $ARI = 0,012$, $NMI = 0,024$ e $V = 0,159$ para faixa de preço. Esses escores próximos de zero confirmam que o agrupamento não supervisionado não reproduz categorias cadastrais prévias, mas organiza os veículos pela dinâmica temporal de suas trajetórias.
+\begin{table}[htbp]
+\caption{Caracterização dos Arquétipos de Depreciação ($K=4$, GASF + PCA)}
+\label{tab:arquetipos}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Grupo} & \textbf{Perfil Temporal} & \textbf{N (\%)} & $\mathbf{\Delta VRR_{32m}}$ & \textbf{\% EV} & \textbf{\% Híb.} \\
+\midrule
+$C_1$ & Valorização Moderada & 1.005 (22,5\%) & $+23,3\%$ & 6,3\% & 14,4\% \\
+$C_2$ & Depreciação Acelerada & 1.624 (36,4\%) & $-13,6\%$ & 65,8\% & 48,4\% \\
+$C_3$ & Super-Valorização & 338 (7,6\%) & $+39,6\%$ & 0,0\% & 0,5\% \\
+$C_4$ & Estabilidade & 1.490 (33,4\%) & $+5,7\%$ & 27,9\% & 36,6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-A análise de variância bidirecional ($2 \times 5$) sobre a variação líquida aos 32 meses indicou que o tipo de combustível responde por quase o dobro da variabilidade explicada frente ao estrato econômico ($SS = 142.704$ contra $SS = 73.614$, ambos com $p < 10^{-39}$). No estrato de Luxo, com veículos pareados no mesmo patamar de entrada, modelos elétricos registraram perda mediana de $-23,8\%$, enquanto modelos a gasolina obtiveram ganho de $+1,2\%$ e a diesel alcançaram $+12,1\%$. Essa diferença de 25 pontos percentuais confirma que a taxa de desvalorização decorre da tecnologia de propulsão e não do patamar de preço.
+A decomposição pela ANOVA bidirecional sobre o $\Delta VRR$ aos 32 meses indicou que a matriz energética responde por quase o dobro da variabilidade explicada frente ao estrato econômico ($SS = 142.704$ contra $SS = 73.614$, ambos com $p < 10^{-39}$). No estrato de Luxo, com ativos de mesmo patamar de entrada, modelos elétricos registraram perda mediana de $-23,8\%$, ao passo que veículos a gasolina obtiveram ganho de $+1,2\%$ e a diesel alcançaram $+12,1\%$. Essa diferença de 25 pontos percentuais confirma que a desvalorização acelerada decorre da tecnologia de propulsão e não do valor do veículo.
 
 \section{Conclusão}
 
-Este estudo investigou a retenção de valor veicular durante a transição energética no Brasil por mineração de séries temporais. Em resposta à primeira questão de pesquisa, a desvalorização acelerada em veículos elétricos decorre da tecnologia de propulsão e não apenas do estrato de preço. Mais de 65\% dos modelos elétricos concentram-se no grupo de desvalorização contínua, e o teste ANOVA comprovou a primazia do combustível sobre o estrato de mercado ($SS = 142.704$ contra $SS = 73.614$), registrando defasagem de 25 pontos percentuais frente a veículos a gasolina de mesmo valor inicial.
+Este trabalho investigou a dinâmica de depreciação veicular sob a transição energética no Brasil por mineração de séries temporais. Em resposta à primeira questão de pesquisa, a desvalorização acelerada observada em veículos elétricos decorre da tecnologia de propulsão e não do patamar de preço. Mais de 65\% dos modelos elétricos concentram-se no grupo de desvalorização contínua, e a análise de variância comprovou o predomínio do combustível sobre a faixa econômica ($SS = 142.704$ contra $SS = 73.614$), gerando defasagem de 25 pontos percentuais frente a veículos a gasolina no mesmo estrato de luxo.
 
-Em resposta à segunda questão de pesquisa, a transformação bidimensional GASF com PCA reduziu a dispersão dos dados e elevou o coeficiente de Silhueta de 0,311 para 0,410, viabilizando o agrupamento com rapidez computacional três ordens de grandeza superior ao método DTW. Como limitação metodológica, o corte temporal de 32 meses exclui modelos lançados muito recentemente. Trabalhos futuros devem estender o monitoramento para avaliar a consolidação das redes de reciclagem e substituição de baterias.
+Em resposta à segunda questão de pesquisa, a codificação matricial bidimensional GASF combinada ao PCA aprimorou a separabilidade dos grupos, elevando o coeficiente de Silhueta de 0,311 para 0,410 e viabilizando o agrupamento com velocidade computacional três ordens de grandeza superior ao método DTW. Como limitação metodológica, o horizonte de 32 meses restringe a análise a safras recentes. Investigações futuras devem acompanhar a evolução dos custos de substituição de baterias e os reflexos de novas políticas industriais sobre o valor residual.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

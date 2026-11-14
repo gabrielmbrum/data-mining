@@ -59,3 +59,42 @@ distância de manhatann, distância euclidiana, correlação, similaridade de co
 a função mais comum é a *Sum of Squared Error* (SSE)
 
 pagina 30
+
+## validação de agrupamento
+
+### validação intrínseca (não supervisionada)
+- **coeficiente de silhueta (s):** mede o equilíbrio entre coesão intra-cluster e separação inter-cluster (Rousseeuw, 1987). Varia de -1 a +1.
+- **índice davies-bouldin (DB):** razão média de dispersão interna pela separação entre centróides (Davies & Bouldin, 1979). Menor é melhor.
+
+### validação extrínseca (concordância com ground truth)
+- **adjusted rand index (ARI):** similaridade entre partições corrigida para chance (-1 a 1).
+- **normalized mutual information (NMI):** informação mútua normalizada entre partição e classes externas (0 a 1).
+- **homogeneidade e completude:** baseadas em entropia condicional.
+- **v de cramér:** intensidade da associação nominal a partir de tabelas de contingência $\chi^2$.
+
+---
+
+# diagnóstico: o agrupamento identifica combustíveis ou faixas de valores?
+
+### 1. métricas de validação externa (K=4)
+- **combustível vs cluster:** ARI = 0.0117, NMI = 0.0217, Homog = 0.0213, Comp = 0.0222, Cramér's V = 0.1395
+- **faixa de preço vs cluster:** ARI = 0.0121, NMI = 0.0239, Homog = 0.0270, Comp = 0.0214, Cramér's V = 0.1594
+
+> Como as séries de VRR foram normalizadas na origem ($P_t / P_0$), a magnitude nominal do preço não direciona os grupos. As métricas com combustível e faixa de preço são equivalentes e baixas, provando que o agrupamento não é mero espelho de nenhum dos dois metadados, mas captura **arquétipos comportamentais** de dinâmica temporal.
+
+### 2. decomposição da variância (ANOVA Two-Way)
+Modelo: $\Delta VRR_{32m} \sim \text{Combustível} + \text{Faixa de Preço}$
+- **Tipo de Combustível:** $SS = 142.703,9$ ($df=4, F=89,51, p = 2,80 \times 10^{-73}$)
+- **Faixa de Preço:** $SS = 73.614,5$ ($df=2, F=92,34, p = 5,08 \times 10^{-40}$)
+
+> O tipo de combustível explica **quase o dobro da variabilidade da depreciação** em relação à faixa de preço de lançamento.
+
+### 3. concentração de elétricos e controle intra-faixa
+- **Concentração Seletiva:** Mais de **55% dos elétricos** (espaço 1D) e **65,8%** (espaço 2D GASF) estão alocados no cluster de Depreciação Acelerada. No cluster de super-valorização pós-pandemia, os elétricos representam apenas 1,5% (ou 0% no 2D).
+- **Controle Intra-Estrato (Luxo):**
+  - Elétrico de Luxo: mediana de **-23,8%** (média de -20,0%)
+  - Gasolina de Luxo: mediana de **+1,2%** (média de +5,4%)
+  - Híbrido de Luxo: mediana de **-10,1%**
+  - Diferença de mais de **25 pontos percentuais** dentro do mesmo segmento econômico de mercado.
+- **Viés de Confundimento (Colinearidade):** 93,2% dos elétricos custavam acima de R$ 150k (Intermediário/Luxo, mediana R$ 322k), enquanto 75,5% dos Flex estão em Entrada (mediana R$ 77k). Não é o preço alto que faz o carro desvalorizar mais; são os eletrificados concentrados nos segmentos superiores que puxam a média para baixo.
+

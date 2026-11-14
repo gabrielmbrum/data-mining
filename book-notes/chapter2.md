@@ -49,11 +49,8 @@ o tipo de operação permitida é baseado no tipo de atributo.
 ![record data types](image/chapter2/image-1.png)
 
 - *record data*: forma básica, onde não há relacionamento entre os registros/atributos.
-
 - *transaction or market basket data*: cada registro envolve uma coleção de items, muito associado a "dados de uma cesta de mercado"
-
 - *data matrix*: todos objetos tem a mesma quantidade de atributos numéricos, e podem ser interpretados como vetores, que unidos formam uma matriz.
-
 - *sparse data matrix*: os atributos são de mesmo tipo e são assimétricos (apenas valores não nulo importam)
 
 ***graph-based data***
@@ -67,11 +64,8 @@ tem duas vertentes: (i) o grafo captura a relação entre os objetos; (ii) os ob
 ![ordered data types](image/chapter2/image-3.png)
 
 - *sequential transaction data*: é uma extensão de transaction data, onde cada transação tem um tempo associado a ela.
-
 - *time series data*: cada registro é uma série temporal.
-
 - *sequence data*: é uma sequência de entidades individuais, como uma sequência de palavras ou letras.
-
 - *spatial and spatio-temporal data*: objetos que tenham atributos espaciais (posição, área...).
 
 ---
@@ -96,12 +90,12 @@ já o *data collection error* se refere ao erro de campos vazios ou inclusao de 
 
 #### *precision, bias and accuracy*
 
->*precision:* proximidade entre medidas repetidas de mesma grandeza
->*bias:* variação sistemática das medições em relação à grandeza que está sendo medida
+> *precision:* proximidade entre medidas repetidas de mesma grandeza
+> *bias:* variação sistemática das medições em relação à grandeza que está sendo medida
 
 a precisão geralmente é medida pelo desvio padrão, já o bias pela diferença entre a média do conjunto e o valor conhecido da grandeza sendo medida (ex.: lab padrao mediu que a massa é 1g, porem a media das minhas medicoes é 1.001g, então o bias é de 0.001).
 
->*accuracy:* proximidade das medidas ao valor verdadeiro da grandeza sendo medida.
+> *accuracy:* proximidade das medidas ao valor verdadeiro da grandeza sendo medida.
 
 os digítos significantes são importantes, onde a quantidade de dígitos deve seguir o limite dos instrumentos de medida utilizados, sem aumentar a precisão sem ter certeza do valor que se está assumindo.
 
@@ -121,7 +115,7 @@ a informação pode não ter sido coletada (ex.: alguem negou forneceu sua idade
 
 #### *inconsistent values*
 
-ex.: CEP que não corresponde a cidade atribuída ao objeto. 
+ex.: CEP que não corresponde a cidade atribuída ao objeto.
 
 existem casos fáceis (altura e peso negativos), porém outros precisam ser consultados em fontes externas.
 
@@ -131,11 +125,11 @@ pode ser duplicatas identicas ou quase identicas. os mesmos dados podem aparecer
 
 ### 2.2.2 *issues related to applications*
 
->"os dados são de alta qualidade se forem utilizados no contexto correto"
+> "os dados são de alta qualidade se forem utilizados no contexto correto"
 
 #### *timeliness*
 
-dados que representam valores de determinado período de tempo podem não ter mais qualidade após o período ter passado.  
+dados que representam valores de determinado período de tempo podem não ter mais qualidade após o período ter passado.
 
 #### *relevance*
 
@@ -190,14 +184,14 @@ quanto mais dimensões os dados tem, se torna mais difícil de analisa-los. os d
 
 #### *linear algebra techniques for dimensionality reduction*
 
-**Principal Componentes Analysis (PCA)** é uma técnica para atributos contínuos que encontram novos atributos que: (i) são combinação linear de atributos originais; (ii) são ortogonais (perpendiculares) um ao outro; (iii) caputram a quantidade máxima de variação nos dados. 
+**Principal Componentes Analysis (PCA)** é uma técnica para atributos contínuos que encontram novos atributos que: (i) são combinação linear de atributos originais; (ii) são ortogonais (perpendiculares) um ao outro; (iii) caputram a quantidade máxima de variação nos dados.
 
 **Singular Value Decomposition (SVD)** é uma técnica de algebra linear que está relacionado ao PCA e também é utilizado para reduzir dimensionalidade.
 
 ### 2.3.4 *feature subset selecion*
 
 - reduz a dimensionaliadde dos dados
-- features redundantes e/ou irrelevantes são removidas 
+- features redundantes e/ou irrelevantes são removidas
 - a seleção de features tem como benefícios: reduzir tempo de treinamento; aumentar generalização -> reduzindo overfitting;
 - atributos irrelevantes e redundantes são fáceis de remover, porém escolher o melhor sub-conjunto de atributos requer abordagens sistemáticas. o ideal seria testar todas as possibildiades, porém tem um custo de com $n$ atributos levar $2^n$ testes.
 - por conta disso, existem tres abordagens padrão:
@@ -230,7 +224,6 @@ quão mais importante a feature, maior seu peso. pesos são dados baseado no con
 pode-se criar atributos para reduzir o total de atributos de um conjunto, visando manter os dados mais importantes. esse processo é específico por domínio, sendo raro a utilização de uma técnica em mais de um domínio. existem duas metodologias gerais:
 
 - *feature extraction*: é a criação de novas features a partir do conjunto cru. ex.: artefatos históricos que originalmente tinha volume e massa para cada material que é constituido, então combina-se eles e cria-se a densidade pra cada material, assim reduzindo de 2 para 1 atributo.
-
 - *mapping the data to a new space*: é a mudança dos dados, criando novas visões sobre o conjunto. ex.: utilização de transformada de fourier para entender o padrões complexos.
 
 ![feat creation - fourier transf](image/chapter2/fourier-transf.png)
@@ -239,8 +232,8 @@ pode-se criar atributos para reduzir o total de atributos de um conjunto, visand
 
 alguns algoritmos de data mining precisam dos dados em formatos categóricos. algoritmos que  encontrão padrões precisam de dados binzarizados.
 
->*discretization*: transformar um atributo contínuo em categórico.
->*binarization*: transformer atributos contínuos/discretos em um, ou mais, atributo(s) binário(s).
+> *discretization*: transformar um atributo contínuo em categórico.
+> *binarization*: transformer atributos contínuos/discretos em um, ou mais, atributo(s) binário(s).
 
 a melhor abordagem é aquele que produz o melhor resultado para o determinado contexto de algoritmo que se está trabalhando.
 
@@ -268,9 +261,20 @@ a trnasformação de contínuo em categórico involve duas partes: (i) decidir q
 
 ***supervised discretization*** é utilizada em  problemas de classificação, com classes conhecidas. a ideia é dividir o conjunto em splits que sejam puros (sem mix de classes), porém em prática tal ideal requer decisões arbitrárias sobre a purezaa de um intervalo e seu tamanho mínimo. para superar isso, existem abordagens estatísticas que começam com cada valor de atributo sendo um intervalo e vai mergeando intervalos adjacentes estatísticamente similares. outra alternativa é dividir inicial o conjunto em duas partes que tenham a mínima entropia.
 
->*entropy*: sendo $k$ o n° de classes, $m_i$ a quantidade de valores no $i^{ésimo}$ intervalo de um partição, e $m_{ij}$ o n° de valores da classe $j$ no intervalo $i$. então a entropia $e_i$ do $i^{ésimo}$ intervalo é igual a  $$e_i = - \sum_{j=1}^k p_{ij} log_2 p_{ij}$$ onde $p_{ij} = m_{ij}/m_i$ é a probabilidade da classe $j$ no $i^{ésimo}$ intervalo. então a entropia total $e$ é a média ponderada dos valores de entropia de cada intervalo $$e =  \sum^n_{i=1} w_i e_i$$ onde $m$ é o número de valores, $w_i = m_i/m$ é a fração  de valores no $i^{ésimo}$ intervalo, e $n$ é o n° de intervalos.
+> *entropy*: sendo $k$ o n° de classes, $m_i$ a quantidade de valores no $i^{ésimo}$ intervalo de um partição, e $m_{ij}$ o n° de valores da classe $j$ no intervalo $i$. então a entropia $e_i$ do $i^{ésimo}$ intervalo é igual a  
+>
+> $$
+> e_i = - \sum_{j=1}^k p_{ij} log_2 p_{ij}
+> $$
+>
+>  onde $p_{ij} = m_{ij}/m_i$ é a probabilidade da classe $j$ no $i^{ésimo}$ intervalo. então a entropia total $e$ é a média ponderada dos valores de entropia de cada intervalo 
+> $$
+> e =  \sum^n_{i=1} w_i e_i
+> $$
+>
+>  onde $m$ é o número de valores, $w_i = m_i/m$ é a fração  de valores no $i^{ésimo}$ intervalo, e $n$ é o n° de intervalos.
 
-#### *atributos categóricos com muitos valores*  
+#### *atributos categóricos com muitos valores*
 
 utiliza-se de conhecimento do domínio (ex.: temos um atributo de disciplinas em uma grande universidade, então agrupa-se por cursos, ou ainda mais, por departamentos). caso não seja possível,  ou produza resultados ruins, então usa-se  de  abbordagens empiricas, como  agrupar apenas as classes que ao serem unidas melhoram os resultados do algoritmo.
 
@@ -300,9 +304,23 @@ a **dissimilaridade** é a medida numérica do grau em que dois objetos são dif
 
 frequentemente utilizadas para converter similaridade em dissimilaridade, ou vice versa, ou para transformar uma medida para um intervalo específico, ex.: [0, 1].
 
-a transformação linear é a mais comum, e segue a seguinte fórmula $$s' = (s - min_s)/(max_s - min_s)$$. a transformação linear presservar as distâncias relativass entre pontos, ex.: ao transformar um *range* [1, 10] para [0, 1], usamos $s' = (s - 1)/9$, a distância relativa entre dois pontos é mantida, onde se dois pontos $x_1$ e $x_2$ são duas vezes mais distantes que $x_3$ e $x_4$ na escala original, isso é mantido na escala resultante.
+a transformação linear é a mais comum, e segue a seguinte fórmula 
 
-para intervalos infinitos, como de [0, +inf], pode-se considerar uma transformação como $$d' = d/(1 + d)$$, em que as dissimilaridades 0, 0,5, 2, 10, 100 e 1000 viram 0, 0,33, 0,67, 0,90, 0,99 e 0,999.
+$$
+s' = (s - min_s)/(max_s - min_s)
+$$
+
+. a transformação linear presservar as distâncias relativass entre pontos, ex.: ao transformar um 
+
+*range* [1, 10] para [0, 1], usamos $s' = (s - 1)/9$, a distância relativa entre dois pontos é mantida, onde se dois pontos $x_1$ e $x_2$ são duas vezes mais distantes que $x_3$ e $x_4$ na escala original, isso é mantido na escala resultante.
+
+para intervalos infinitos, como de [0, +inf], pode-se considerar uma transformação como 
+
+$$
+d' = d/(1 + d)
+$$
+
+, em que as dissimilaridades 0, 0,5, 2, 10, 100 e 1000 viram 0, 0,33, 0,67, 0,90, 0,99 e 0,999.
 
 mapear medidas de proximidade para o intervalo [0, 1] pode mudar o significado da medida, podendo, por exemplo, perder informação do sinal ao mapear de [-1, 1] para [0, 1], o que pode ser importante em determinado contexto.
 
@@ -320,15 +338,32 @@ objetos com um único atributo ordinal, a ordem deve ser levada em conta, como c
 
 #### *distances*
 
-a distância eucliidiana $d$ entre dois pontos $x$ e $y$ em um espaço n-dimensional, é dado por $$d(x, y) = \sqrt{\sum_{k=1}^n (x_k - y_k)^2}$$. 
+a distância eucliidiana $d$ entre dois pontos $x$ e $y$ em um espaço n-dimensional, é dado por 
 
-outra distância é a de minkowski, definida por $$d(x, y) = (\sum_{k=1}^n |x_k - y_k|^r)^{1/r}$$, onde $r$ é um parâmetro. com $r = 1$ esta distância é utilizada para medir a quantidade de bits diferentess entre dois objetos que só tem atributos binários. com $r = 2$ vira a euclidiana. já com $r = \infty$ é chamado de supremum distance, que é a máxima distância entre quaisquers atributos de objetos. a distância $L_\infty$ é definida por $$d(x, y) = \lim_{r \to \infty} (\sum_{k=1}^n |x_k - y_k|^r)^{1/r}$$.
+$$
+d(x, y) = \sqrt{\sum_{k=1}^n (x_k - y_k)^2}
+$$
+
+.
+
+outra distância é a de minkowski, definida por 
+
+$$
+d(x, y) = (\sum_{k=1}^n |x_k - y_k|^r)^{1/r}
+$$
+
+, onde $r$ é um parâmetro. com $r = 1$ esta distância é utilizada para medir a quantidade de bits diferentess entre dois objetos que só tem atributos binários. com $r = 2$ vira a euclidiana. já com $r = \infty$ é chamado de supremum distance, que é a máxima distância entre quaisquers atributos de objetos. a distância $L_\infty$ é definida por 
+$$
+d(x, y) = \lim_{r \to \infty} (\sum_{k=1}^n |x_k - y_k|^r)^{1/r}
+$$
+
+.
 
 a distância euclidiana tem as seguintes propriedades:
 
 ![propriedades dist euclidiana](image/chapter2/1788908266448.png)
 
-medidas que satisfazam essas propriedades são chamadas de métricas. 
+medidas que satisfazam essas propriedades são chamadas de métricas.
 
 ### 2.4.4 *similarities between data objects*
 
@@ -345,57 +380,136 @@ medidas entre objetos que contêm apenas atributos binários são chamadas de **
 - $f_{10}$ = n° de atributos onde $x$ é 1 e $y$ é 0
 - $f_{11}$ = n° de atributos onde $x$ é 1 e $y$ é 1
 
-***simple matching coefficient (SMC)*** é uma similaridade definida por $$SMC = \frac{f_{11} + f_{00}}{f_{11} + f_{00} + f_{10} + f_{01}}$$ que conta a presença e ausência de igualdade nos valores.
+***simple matching coefficient (SMC)*** é uma similaridade definida por 
 
-***jaccard coefficient*** é utilizada em matrizes de transação, em contextos onde a quantidade de ocorrências de uma das classes são por natureza assimétricas, como uma matriz com os itens comprados no mercado (teriam muito 0 pois o mercado tem muitos itens). é definido por $$J = \frac{\text{number of matching presences}}{\text{number of attributes not involved in 00 matches}} = \frac{f_{11}}{f_{01} + f_{10} + f_{11}}$$
+$$
+SMC = \frac{f_{11} + f_{00}}{f_{11} + f_{00} + f_{10} + f_{01}}
+$$
 
-***cosine similarity*** documentos são representados como vetores, em que cada atributo é frequência de cada palavra no documento. tem poucos *non-zero attributes*, então a similaridade não deve depender da quantidade de 0-0, assim como o jaccard $$\cos(x, y) = \frac{\langle x, y \rangle}{\|x\| \|y\|} = \frac{x'y}{\|x\| \|y\|}$$ o ' indica o vetor/matriz transposta e $\langle x, y \rangle$ indica o produto interno dos dois vetores, $$\langle x, y \rangle = \sum_{k=1}^{n} x_k y_k = x'y$$ e $\|x\|$ é o tamanho do vetor $x$, $\|x\| = \sqrt{\sum_{k=1}^{b} x_k^2} = \sqrt{\langle x, y \rangle} = \sqrt{x'x}$.
+ que conta a presença e ausência de igualdade nos valores.
 
-***extended jaccard coefficient*** é a versão do jaccard para dados não binários é representado por EJ, que é definido por $$EJ(x, y) = \frac{\langle x, y\rangle}{\Vert{}x\Vert{}^2 + \Vert{}y\Vert{}^2 - \langle x, y\rangle} = \frac{x'y}{\Vert{}x\Vert{}^2 + \Vert{}y\Vert{}^2 - x'y}$$
+***jaccard coefficient*** é utilizada em matrizes de transação, em contextos onde a quantidade de ocorrências de uma das classes são por natureza assimétricas, como uma matriz com os itens comprados no mercado (teriam muito 0 pois o mercado tem muitos itens). é definido por 
+
+$$
+J = \frac{\text{number of matching presences}}{\text{number of attributes not involved in 00 matches}} = \frac{f_{11}}{f_{01} + f_{10} + f_{11}}
+$$
+
+
+***cosine similarity*** documentos são representados como vetores, em que cada atributo é frequência de cada palavra no documento. tem poucos *non-zero attributes*, então a similaridade não deve depender da quantidade de 0-0, assim como o jaccard 
+
+$$
+\cos(x, y) = \frac{\langle x, y \rangle}{\|x\| \|y\|} = \frac{x'y}{\|x\| \|y\|}
+$$
+
+ o ' indica o vetor/matriz transposta e $\langle x, y \rangle$ indica o produto interno dos dois vetores, 
+$$
+\langle x, y \rangle = \sum_{k=1}^{n} x_k y_k = x'y
+$$
+
+ e $\|x\|$ é o tamanho do vetor $x$, $\|x\| = \sqrt{\sum_{k=1}^{b} x_k^2} = \sqrt{\langle x, y \rangle} = \sqrt{x'x}$.
+
+***extended jaccard coefficient*** é a versão do jaccard para dados não binários é representado por EJ, que é definido por 
+
+$$
+EJ(x, y) = \frac{\langle x, y\rangle}{\Vert{}x\Vert{}^2 + \Vert{}y\Vert{}^2 - \langle x, y\rangle} = \frac{x'y}{\Vert{}x\Vert{}^2 + \Vert{}y\Vert{}^2 - x'y}
+$$
+
 
 **correlation** é utilizado para medir a relação linear entre dois conjuntos de valores. então mede a relação entre duas variáveis ou dois objetos. é muito mais utilizada para medir entre atributos, pois os valores em dois objetos podem ter difernetes escalas e tipos. aqui terá o foco em valores numericos.
 
-***Pearson's correlation*** é medida entre dois conjuntos numéricos, dois vetores x e y, e então é definido por $$corr(x, y) = \frac{\text{covariance}(x, y)}{\text{standard\_deviation}(x) \times \text{standard\_deviation}(y)} = \frac{s_{xy}}{s_x s_y}$$ $$\begin{aligned} \bar{x} &= \frac{1}{n} \sum_{k=1}^{n} x_k \text{ is the mean of } x \\ \bar{y} &= \frac{1}{n} \sum_{k=1}^{n} y_k \text{ is the mean of } y \end{aligned}$$
+***Pearson's correlation*** é medida entre dois conjuntos numéricos, dois vetores x e y, e então é definido por 
+
+$$
+corr(x, y) = \frac{\text{covariance}(x, y)}{\text{standard\_deviation}(x) \times \text{standard\_deviation}(y)} = \frac{s_{xy}}{s_x s_y}
+$$
+
+$$
+\begin{aligned} \bar{x} &= \frac{1}{n} \sum_{k=1}^{n} x_k \text{ is the mean of } x \\ \bar{y} &= \frac{1}{n} \sum_{k=1}^{n} y_k \text{ is the mean of } y \end{aligned}
+$$
+
 
 ### 2.4.6 *mutual informations*
 
 assim como correlação, informação mútua é utilizada como medida de similaridade entre pares de conjuntos de valores, particularmente quando suspeita-se uma relação não linear entre os valores. é uma métrica derivada da teoria da informação. *mutual information* **mede quanto de informação um conjunto de valores fornece sobre outro**.
 
-para definir, consideramos dois conjuntos de valores, X e Y, que ocorrem em parer (X, Y). então mede-se a informação média em um dos conjuntos de valores e nos pares (normalmente utiliza-se da entropia). no caso em que X e Y contêm valores discretos, a entropia pode ser medida por: $$H(X) = -\sum_{j=1}^{m} P(X = u_j) \log_2 P(X = u_j)$$, $$H(Y) = -\sum_{k=1}^{n} P(Y = v_k) \log_2 P(Y = v_k)$$ e $$H(X,Y) = -\sum_{j=1}^{m} \sum_{k=1}^{n} P(X = u_j, Y = v_k) \log_2 P(X = u_j, Y = v_k)$$. isto posto, a informação mútua I pode ser definida como $$I(X, Y) = H(X) + H(Y) - H(X,Y)$$.
+para definir, consideramos dois conjuntos de valores, X e Y, que ocorrem em parer (X, Y). então mede-se a informação média em um dos conjuntos de valores e nos pares (normalmente utiliza-se da entropia). no caso em que X e Y contêm valores discretos, a entropia pode ser medida por: 
+
+$$
+H(X) = -\sum_{j=1}^{m} P(X = u_j) \log_2 P(X = u_j)
+$$
+
+, 
+$$
+H(Y) = -\sum_{k=1}^{n} P(Y = v_k) \log_2 P(Y = v_k)
+$$
+
+ e 
+$$
+H(X,Y) = -\sum_{j=1}^{m} \sum_{k=1}^{n} P(X = u_j, Y = v_k) \log_2 P(X = u_j, Y = v_k)
+$$
+
+. isto posto, a informação mútua I pode ser definida como 
+$$
+I(X, Y) = H(X) + H(Y) - H(X,Y)
+$$
+
+.
 
 ### 2.4.7 *kernel functions*
 
-a similaridade e distancia são facilmente aplicáveis a tarefas de agrupamento, porem para outras tarefas de analise de dados, como modelagem para predição e redução de dimensionalidade, podem ser expressas em termo de "proximidades" em pares de objetos de dados. alguns problemas podem ser formulados utilizando com entrada *kernel matrix (K)*, que é um tipo de matriz de proximidade. então, como uma etapa de pré-processamento é utilizada para transformar os dados de entrada em uma matriz kernel. 
+a similaridade e distancia são facilmente aplicáveis a tarefas de agrupamento, porem para outras tarefas de analise de dados, como modelagem para predição e redução de dimensionalidade, podem ser expressas em termo de "proximidades" em pares de objetos de dados. alguns problemas podem ser formulados utilizando com entrada *kernel matrix (K)*, que é um tipo de matriz de proximidade. então, como uma etapa de pré-processamento é utilizada para transformar os dados de entrada em uma matriz kernel.
 
 formalmente, dado um conjunto de $m$ objetos, então **K** é uma matriz $m$ por $m$, onde cada entrada $k_{ij}$ é formado pelo resultado de uma *kernel function* utilizando os i-ésimo ($x_i$) e j-ésimo ($x_j$) objetos, logo: $k_{ij} = k(x_i, x_j). o uso da matriz K permite uma aplicação mais ampla de um algoritmo para vários tipos de dados e a capacidade de modelar relações não lineares a partir de algoritmos que originalmente são projetados para relações lineares.
 
-***kernel make an algorithm data independent*** se um algoritmo usa matriz de kernel, então ele pode ser usado para qualquer tipo de dado que pode ser modelado para uma função de kernel. apenas alguns algoritmos podem ser modificados para receber uma matriz de kernel como entrada. 
+***kernel make an algorithm data independent*** se um algoritmo usa matriz de kernel, então ele pode ser usado para qualquer tipo de dado que pode ser modelado para uma função de kernel. apenas alguns algoritmos podem ser modificados para receber uma matriz de kernel como entrada.
 
 ![basic kernel algorithm](image/chapter2/1790094310571.png)
 
-***mapping data into a higher dimensional data space can allow modeling of nonlinear relationships*** os algoritmos de kernel conseguem modelar relações não lineares, a partir de algoritmos lineares. geralmente isso é feito por meio de uma transformação que aumente a dimensão do espaço dos dados. 
+***mapping data into a higher dimensional data space can allow modeling of nonlinear relationships*** os algoritmos de kernel conseguem modelar relações não lineares, a partir de algoritmos lineares. geralmente isso é feito por meio de uma transformação que aumente a dimensão do espaço dos dados.
 
 ***the kernel trick*** não aprofundei, precisa antes estudar o aumento de dimensão para então ler o trick do kernel.
 
 ### 2.4.8 *bregman divergence*
 
-é uma familia de funções de proximidade, podendo serem utilizadas em algoritmos de agrupamento baseados nessa divergência. divergências de bregman são funções de perda ou distorção. um exemplo é o algoritmo *K-means* para clusterização.  
+é uma familia de funções de proximidade, podendo serem utilizadas em algoritmos de agrupamento baseados nessa divergência. divergências de bregman são funções de perda ou distorção. um exemplo é o algoritmo *K-means* para clusterização.
 
->**definição (*bregman divergence*)** dado uma funçaõ convexa estrita $\phi$, a divergência de Bregman (função de perda) D(x,y) gerado pela função é dado pela equação: $$D(x, y) = \phi(x) - \phi(y) - \langle \nabla \phi(y), (x - y) \rangle$$ onde $\nabla \phi(y)$ é o gradiente de $\phi$ calculado em y, e (x - y) é a diferença de vetor entre x e y, e $\langle \nabla \phi(y), (x - y) \rangle$ é o produto interno dos elementos. 
+> **definição (*bregman divergence*)** dado uma funçaõ convexa estrita $\phi$, a divergência de Bregman (função de perda) D(x,y) gerado pela função é dado pela equação: 
+>
+> $$
+> D(x, y) = \phi(x) - \phi(y) - \langle \nabla \phi(y), (x - y) \rangle
+> $$
+>
+>  onde $\nabla \phi(y)$ é o gradiente de $\phi$ calculado em y, e (x - y) é a diferença de vetor entre x e y, e $\langle \nabla \phi(y), (x - y) \rangle$ é o produto interno dos elementos.
 
-$D(x. y)$ pode ser escrita como $D(x, y) = \phi(x) - L(x)$, onde $L(x) = \phi(y) + \langle \nabla \phi(y), (x - y) \rangle$ e representa uma equação de um plano que é tangente da função $\phi$ em $y$. 
+$D(x. y)$ pode ser escrita como $D(x, y) = \phi(x) - L(x)$, onde $L(x) = \phi(y) + \langle \nabla \phi(y), (x - y) \rangle$ e representa uma equação de um plano que é tangente da função $\phi$ em $y$.
 
 ### 2.4.9 *issues in proximity calculation*
 
 aqui será tratado alguns problemas comuns relacionados as medidas de proximidade.
 
-***standardization and correlation for distance measures*** uma questão importante é lidar com atributos que não tem o mesmo intervalo de valores (diferente escalas). quando temos métricas diferentes, como renda e idade, utiliza-se da normalização para resolver. um outro problema relacionado é o cálculo de distância quando há correlação entre alguns atributos, então usa-se a *Mahalanobis distance*, que é uma generalização da distância euclidiana, que é útil também em dados com uma distribuição gaussiana (normal). variáveis correlacionadas tem um grande impacto em distâncias padrões, desde que uma mudança em qualquer variável correlacionado é refletida em uma mudança em todas as variáveis correlacionadas. a distância de Mahalanobis entre dois vetores x e y é definida como $$\text{Mahalanobis}(x, y) = \sqrt{(x - y)' \Sigma^{-1} (x - y)}$$, onde $\Sigma^{-1}$ é o inverso da covariância da matriz de dados. 
+***standardization and correlation for distance measures*** uma questão importante é lidar com atributos que não tem o mesmo intervalo de valores (diferente escalas). quando temos métricas diferentes, como renda e idade, utiliza-se da normalização para resolver. um outro problema relacionado é o cálculo de distância quando há correlação entre alguns atributos, então usa-se a *Mahalanobis distance*, que é uma generalização da distância euclidiana, que é útil também em dados com uma distribuição gaussiana (normal). variáveis correlacionadas tem um grande impacto em distâncias padrões, desde que uma mudança em qualquer variável correlacionado é refletida em uma mudança em todas as variáveis correlacionadas. a distância de Mahalanobis entre dois vetores x e y é definida como 
 
-***combining similarities for heterogeneous attributes*** precisa-se de uma maneira de medir similaridade entre atributos de tipos diferentes. 
+$$
+\text{Mahalanobis}(x, y) = \sqrt{(x - y)' \Sigma^{-1} (x - y)}
+$$
+
+, onde $\Sigma^{-1}$ é o inverso da covariância da matriz de dados.
+
+***combining similarities for heterogeneous attributes*** precisa-se de uma maneira de medir similaridade entre atributos de tipos diferentes.
 
 ![algoritmo para similaridade entre objetos heterogeneos](image/chapter2/1791288654245.png)
 
-***using weights*** nos casos anteriores todos os atributos tinham a mesma importância, porém nem todos os problemas são assim. então para essas situações, as formulas para aproximação podem ser modificadas para ter um peso de contribuição para cada atributo, como exemplo $$\text{similarity}(x, y) = \frac{\sum_{k=1}^n w_k \delta_k s_k(x, y)}{\sum_{k=1}^n w_k \delta_k}$$, já a distancia de Minkowski vira $$d(x, y) = \left( \sum_{k=1}^n w_k \vert{}x_k - y_k\vert{}^r \right)^{1/r}$$
+***using weights*** nos casos anteriores todos os atributos tinham a mesma importância, porém nem todos os problemas são assim. então para essas situações, as formulas para aproximação podem ser modificadas para ter um peso de contribuição para cada atributo, como exemplo 
+
+$$
+\text{similarity}(x, y) = \frac{\sum_{k=1}^n w_k \delta_k s_k(x, y)}{\sum_{k=1}^n w_k \delta_k}
+$$
+
+, já a distancia de Minkowski vira 
+$$
+d(x, y) = \left( \sum_{k=1}^n w_k \vert{}x_k - y_k\vert{}^r \right)^{1/r}
+$$
+
 
 ### 2.4.10 *selecting the right proximity measure*
 
@@ -403,5 +517,4 @@ o tipo da medida de proximidade deve se alinhar ao tipo do dado estudado. para v
 
 para dados esparsos, normalmente utiliza-se medidas que ignoram matches 0-0. conceitualmente, um par de objetos complexos tem sua similaridade dependendo da quantidade de características que eles compartilham, enão as medidas de cosseno, Jaccard e extended Jaccard são apropriadadas.
 
-para dados em vetores, o cosseno é mais adequado para documentos esparsos, já a correlação serve melhor para séries temporais. distâncias são mais usadas quando dois vetores de dados estão querendo ser comparados o mais próximo possível em relação a todos as features que possuem. 
-
+para dados em vetores, o cosseno é mais adequado para documentos esparsos, já a correlação serve melhor para séries temporais. distâncias são mais usadas quando dois vetores de dados estão querendo ser comparados o mais próximo possível em relação a todos as features que possuem.

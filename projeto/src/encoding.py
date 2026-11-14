@@ -31,18 +31,18 @@ COHORT_KEYS = ["codigo_fipe", "ano_modelo", "sigla_combustivel"]
 
 
 def compute_price_thresholds(
-    df: pl.DataFrame, min_launch_year: int = 2019
+    df: pl.DataFrame, min_model_year: int = 2019
 ) -> tuple[float, float]:
     """
     Computes the global Q1 and Q3 of launch prices (in R$) used to segment vehicles
     into Entrada / Intermediario / Luxo.
 
     Follows the same procedure as `run_segmented_price_analysis` in eda.py: the
-    quartiles are taken over all unique vehicles launched from 'min_launch_year',
+    quartiles are taken over all unique vehicles with model year from 'min_model_year',
     regardless of how long their history is.
     """
     prices = (
-        df.filter(pl.col("ano_lancamento") >= min_launch_year)
+        df.filter(pl.col("ano_modelo") >= min_model_year)
         .select(COHORT_KEYS + ["preco_lancamento"])
         .unique()
         .with_columns((pl.col("preco_lancamento") / 100).alias("preco_reais"))
@@ -73,13 +73,13 @@ def add_price_segment(
 def build_series_matrix(
     df: pl.DataFrame,
     window: int,
-    min_launch_year: int = 2019,
+    min_model_year: int = 2019,
     max_gap_frac: float = 0.10,
 ) -> tuple[pl.DataFrame, np.ndarray]:
     """
     Builds the matrix of VRR series (one row per vehicle) over the first 'window' months.
 
-    A vehicle is kept if it was launched from 'min_launch_year' and has history
+    A vehicle is kept if its model year is >= 'min_model_year' and has history
     covering months 0 .. window-1. Months missing inside the window are filled by
     linear interpolation; vehicles whose fraction of missing months exceeds
     'max_gap_frac' are discarded. If several records exist for the same vehicle and
@@ -88,7 +88,7 @@ def build_series_matrix(
     Returns the vehicle metadata (same row order as the matrix) and the matrix of
     VRR values (ratio, not percentage) with shape (n_vehicles, window).
     """
-    df_recent = df.filter(pl.col("ano_lancamento") >= min_launch_year)
+    df_recent = df.filter(pl.col("ano_modelo") >= min_model_year)
 
     vehicles = (
         df_recent.group_by(COHORT_KEYS)
@@ -111,7 +111,7 @@ def build_series_matrix(
     )
     n_long = vehicles.height
     print(
-        f"Vehicles launched >= {min_launch_year}: {n_all:,} | "
+        f"Vehicles with model year >= {min_model_year}: {n_all:,} | "
         f"with at least {window} months of history: {n_long:,}"
     )
 
@@ -332,7 +332,7 @@ def run_encoding(
     df: pl.DataFrame,
     output_dir: Path,
     windows: tuple = (24, 32, 48, 64),
-    min_launch_year: int = 2019,
+    min_model_year: int = 2019,
     vrr_max: float = 1.5,
     n_bins: int = 8,
     mtf_strategy: str = "quantile",
@@ -349,15 +349,15 @@ def run_encoding(
         config.json                   parameters used to generate the files
         examples.png                  grid with example vehicles and their images
     """
-    print(f"\n--- Encoding series as images (launch year >= {min_launch_year}) ---")
+    print(f"\n--- Encoding series as images (model year >= {min_model_year}) ---")
 
-    q1_reais, q3_reais = compute_price_thresholds(df, min_launch_year)
+    q1_reais, q3_reais = compute_price_thresholds(df, min_model_year)
     print(f"Q1 (end of Entrada): R$ {q1_reais:,.2f} | Q3 (start of Luxo): R$ {q3_reais:,.2f}")
 
     for window in windows:
         print(f"\n>> Window: {window} months <<")
         vehicles, series = build_series_matrix(
-            df, window, min_launch_year=min_launch_year, max_gap_frac=max_gap_frac
+            df, window, min_model_year=min_model_year, max_gap_frac=max_gap_frac
         )
 
         if vehicles.height == 0:
@@ -398,7 +398,8 @@ def run_encoding(
             "window_months": window,
             "image_size": window,
             "n_vehicles": vehicles.height,
-            "min_launch_year": min_launch_year,
+            "min_model_year": min_model_year,
+            "min_launch_year": min_model_year,
             "vrr_scale_max": vrr_max,
             "clipped_fraction": clipped_frac,
             "mtf_bins": n_bins,

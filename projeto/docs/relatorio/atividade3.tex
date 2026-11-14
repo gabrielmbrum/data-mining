@@ -48,13 +48,13 @@ de forma que $M_{ij}$ é a probabilidade de transição entre o quantil do insta
 \subsection{Metodologia}
 % descrever como foi feita a transformação (mapeando os dados seriados de depreciação), as janelas escolhidas e o output final (imagens e arquivos)
 
-O fluxo do trabalho inicia com a série de entrada sendo a taxa de retenção de valor (VRR) de cada veículo, que é codificada em imagens GASF, GADF e MTF. Para cada janela de tamanho $T \in \{24, 32, 48, 64\}$ meses, são selecionados veículos lançados a partir de 2019 que possuem histórico completo para os primeiros $T$ meses. Meses ausentes são preenchidos por interpolação linear, e séries com mais de $10\%$ de meses ausentes são descartadas. Cada série é reescalonada globalmente em $[0,1]$, e o MTF é calculado com $Q=8$ \textit{bins} de quantis por série. As saídas incluem as imagens codificadas, as séries brutas de VRR e metadados dos veículos. A Figura \ref{fig:pipeline_encoding} ilustra o processo completo dessa geração.
+O fluxo do trabalho inicia com a série de entrada sendo a taxa de retenção de valor (VRR) de cada veículo, que é codificada em imagens GASF, GADF e MTF. Para cada janela de tamanho $T \in \{24, 32, 48, 64\}$ meses, são selecionados veículos com ano-modelo a partir de 2019 ($\textit{ano\_modelo} \ge 2019$) que possuem histórico completo para os primeiros $T$ meses. Meses ausentes são preenchidos por interpolação linear, e séries com mais de $10\%$ de meses ausentes são descartadas. Cada série é reescalonada globalmente em $[0,1]$, e o MTF é calculado com $Q=8$ \textit{bins} de quantis por série. As saídas incluem as imagens codificadas, as séries brutas de VRR e metadados dos veículos. A Figura \ref{fig:pipeline_encoding} ilustra o processo completo dessa geração.
 
 \input{pipeline_encoding.tex}
 
 \subsubsection{Série de entrada: taxa de retenção de valor}
 
-A série a ser codificada é a \textit{Value Retention Rate} (VRR) de cada veículo. Após a limpeza e o pré-processamento dos dados da tabela FIPE (remoção de registros duplicados e de valor zero, filtro para carros, exclusão de combustíveis gás natural e etanol, filtro de marcas relevantes e de veículos lançados há mais de 20 anos), cada coorte é identificada pela chave (\texttt{codigo\_fipe}, \texttt{ano\_modelo}, \texttt{sigla\_combustivel}). A idade do veículo em meses (\texttt{idade\_meses}) é calculada como a diferença entre o mês de referência e o mês da primeira cotação (\texttt{data\_lancamento}), e a VRR é definida como
+A série a ser codificada é a \textit{Value Retention Rate} (VRR) de cada veículo. Após a limpeza e o pré-processamento dos dados da tabela FIPE (remoção de registros duplicados e de valor zero, filtro para carros, consistência de cadastro $(\textit{ano\_lancamento} - \textit{ano\_modelo}) \le 1$, exclusão de combustíveis gás natural e etanol, filtro de marcas relevantes e de veículos com ano-modelo superior a 20 anos), cada coorte é identificada pela chave (\texttt{codigo\_fipe}, \texttt{ano\_modelo}, \texttt{sigla\_combustivel}). A idade do veículo em meses (\texttt{idade\_meses}) é calculada como a diferença entre o mês de referência e o mês da primeira cotação (\texttt{data\_lancamento}), e a VRR é definida como
 \begin{equation}
 \mathrm{VRR}_t = \frac{\text{valor}_t}{\text{valor}_{t=0}},
 \end{equation}
@@ -62,7 +62,7 @@ em que o preço de lançamento $\text{valor}_{t=0}$ é ancorado na cotação do 
 
 \subsubsection{Janelas e seleção de veículos}
 
-Foram definidas quatro janelas, $T \in \{24, 32, 48, 64\}$ meses. Para cada janela, entram na amostra os veículos lançados a partir de 2019 que possuem histórico cobrindo os meses $0$ a $T-1$, e cada veículo é representado pelos seus primeiros $T$ meses de VRR. Quando há mais de um registro para o mesmo veículo e mês, utiliza-se a média. Meses ausentes dentro da janela são preenchidos por interpolação linear, e séries cuja fração de meses ausentes excede $10\%$ da janela são descartadas. A quantidade de veículos varia de acordo com a janela, já que janelas maiores exigem históricos mais longos.
+Foram definidas quatro janelas, $T \in \{24, 32, 48, 64\}$ meses. Para cada janela, entram na amostra os veículos com ano-modelo a partir de 2019 ($\textit{ano\_modelo} \ge 2019$) que possuem histórico cobrindo os meses $0$ a $T-1$, e cada veículo é representado pelos seus primeiros $T$ meses de VRR. Quando há mais de um registro para o mesmo veículo e mês, utiliza-se a média. Meses ausentes dentro da janela são preenchidos por interpolação linear, e séries cuja fração de meses ausentes excede $10\%$ da janela são descartadas. A amostra final resultou em $4.923$ veículos para a janela de 24 meses, $4.457$ para 32 meses, $3.388$ para 48 meses e $2.497$ veículos para 64 meses.
 
 \subsubsection{Codificação em imagens}
 
@@ -75,7 +75,7 @@ Cada série é codificada em três imagens $T \times T$, sem PAA e sem redimensi
 
 \subsubsection{Segmentação por faixa de preço}
 
-Para analisar o comportamento de cada tipo de veículo, os veículos foram segmentados pelo preço de lançamento, a partir do primeiro (Q1) e do terceiro quartil (Q3) dos preços de todos os veículos únicos lançados desde 2019, independentemente do tamanho do histórico (mesmo procedimento da análise exploratória): \textbf{Entrada} (preço $\le$ Q1), \textbf{Intermediário} (Q1 $<$ preço $\le$ Q3) e \textbf{Luxo} (preço $>$ Q3).
+Para analisar o comportamento de cada tipo de veículo, os veículos foram segmentados pelo preço de lançamento, a partir do primeiro ($Q_1 = \text{R\$} \, 103.927$) e do terceiro quartil ($Q_3 = \text{R\$} \, 386.184$) dos preços de todos os $9.299$ veículos únicos com $\textit{ano\_modelo} \ge 2019$, independentemente do tamanho do histórico: \textbf{Entrada} (preço $\le Q_1$), \textbf{Intermediário} ($Q_1 < \text{preço} \le Q_3$) e \textbf{Luxo} (preço $> Q_3$).
 
 \subsubsection{Saídas geradas}
 

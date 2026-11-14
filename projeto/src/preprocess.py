@@ -79,18 +79,18 @@ def filter_relevant_brands(df: pl.DataFrame) -> pl.DataFrame:
 
 def filter_by_release_year(df: pl.DataFrame, max_age: int = 20) -> pl.DataFrame:
     """
-    Filters out vehicles older than a specified maximum age based on their true launch year.
+    Filters out vehicles older than a specified maximum age based on their model year.
 
     This function restricts the dataset to a specific cohort by ensuring that only
-    vehicles released within the last 'max_age' years (relative to 2026) are kept.
+    vehicles with model year within the last 'max_age' years (relative to 2026) are kept.
     """
     raw_total = df.height
 
-    df = df.filter(pl.col("ano_lancamento") >= 2026 - max_age)
+    df = df.filter(pl.col("ano_modelo") >= 2026 - max_age)
 
     cooked_total = df.height
     print(
-        f"Records with release year older than {2026 - max_age} removed: {raw_total - cooked_total:,}"
+        f"Records with model year older than {2026 - max_age} removed: {raw_total - cooked_total:,}"
     )
     return df
 

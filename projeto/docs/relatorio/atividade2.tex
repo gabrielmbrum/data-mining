@@ -13,7 +13,7 @@ Analisando a distribuição de marcas e combustíveis, identificou-se que veícu
 
 Para evitar o viés de acúmulo temporal (onde veículos antigos parecem ter um portfólio maior simplesmente por estarem há mais meses na base), a relevância das montadoras foi mensurada contando-se os modelos de veículos estritamente únicos (\textit{codigo\_fipe} + \textit{ano\_modelo} + \textit{sigla\_combustivel}). Definiu-se o seguinte critério de corte: foram mantidas na base apenas as marcas que apresentassem um portfólio superior a 30 veículos únicos no total ou que possuíssem, no mínimo, 15 veículos únicos eletrificados (elétricos e híbridos). Esta abordagem com múltiplos limiares justifica-se pela necessidade de tratar distribuições de frequência assimétricas em tarefas de mineração de dados, garantindo que os veículos eletrificados e as montadoras entrantes sejam adequadamente representadas. O limiar de volume atua na filtragem de ruídos, enquanto a regra de exceção preserva as montadoras recentes, assegurando densidade sem distorcer os padrões subjacentes \cite{tan2019introduction}.
 
-Para evitar que o modelo compare o comportamento econômico de carros a combustão da década de 1990 com elétricos da década de 2020, o escopo foi restringido a uma janela de mercado máxima de 20 anos. Os veículos cujo \textit{ano\_lancamento} absoluto era anterior ao corte estipulado foram removidos. A partir das amostras filtradas, estratificando a idade absoluta dos veículos e a sua respectiva matriz energética, obtiveram-se os resultados apresentados na Figura \ref{fig:idade_veiculos}.
+Para evitar que o modelo compare o comportamento econômico de carros a combustão da década de 1990 com elétricos da década de 2020, o escopo macroeconômico foi restringido a uma janela de mercado máxima de 20 anos. Os veículos cujo \textit{ano\_modelo} era anterior a 2006 foram removidos, totalizando $1.162.536$ registros excluídos e restando $2.528.153$ instâncias na base consolidada. A partir das amostras filtradas, estratificando a idade absoluta dos veículos e a sua respectiva matriz energética, obtiveram-se os resultados apresentados na Figura \ref{fig:idade_veiculos}.
 
 \begin{figure}[htpb]
     \centering
@@ -54,11 +54,11 @@ Por outro lado, para capturar o comportamento macroeconômico e o impacto de eve
     \label{fig:yoy_depreciation_curves}
 \end{figure}
 
-A fim de ter uma compreensão mais específica do comportamento de depreciação, foi criada uma visualização das faixas de valores de lançamento das amostras separadas por matriz energética, conforme apresentado na Figura \ref{fig:price_brackets}. O gráfico boxplot evidencia que o tipo de motorização impacta diretamente na faixa de preço dos veículos, então para uma análise de depreciação por categoria de nível de preço, foi necessário analisar globalmente os veículos, independentemente de sua matriz energética, assim a Figura \ref{fig:price-boxplot-general} apresenta a distribuição de todos os veículos e define três faixas de valores:
+A fim de ter uma compreensão mais específica do comportamento de depreciação, foi criada uma visualização das faixas de valores de lançamento das amostras separadas por matriz energética, conforme apresentado na Figura \ref{fig:price_brackets}. O gráfico boxplot evidencia que o tipo de motorização impacta diretamente na faixa de preço dos veículos, então para uma análise de depreciação por categoria de nível de preço, foi necessário analisar globalmente os veículos da coorte recente ($\textit{ano\_modelo} \ge 2019$), independentemente de sua matriz energética, definindo três faixas de valores a partir dos quartis globais de mercado:
 
 \begin{itemize}
-    \item Veículos de entrada ($x \le Q_1$), sendo que $Q_1 = \text{R\$} \, 108.750$;
-    \item Veículos intermediários ($Q_1 < x \le Q_3$), sendo que $Q_3 = \text{R\$} \, 400.110$;
+    \item Veículos de entrada ($x \le Q_1$), sendo que $Q_1 = \text{R\$} \, 103.927$;
+    \item Veículos intermediários ($Q_1 < x \le Q_3$), sendo que $Q_3 = \text{R\$} \, 386.184$;
     \item Veículos de luxo ($x > Q_3$).
 \end{itemize}
 
